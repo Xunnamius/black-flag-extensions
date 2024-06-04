@@ -111,7 +111,7 @@ For example:
 ```
 
 This configuration allows the following arguments: no arguments (`∅`), `-y=...`,
-`-y=... z`, `-x -y=one`, `-xz -y=one`; and disallows: `-x`, `-z`, `-x -y=...`,
+`-y=... z`, `-xz -y=one`; and disallows: `-x`, `-z`, `-x -y=...`, `-xz -y=...`,
 `-xz`.
 
 ##### `conflicts`
@@ -146,7 +146,7 @@ For example:
 ```
 
 This configuration allows the following arguments: no arguments (`∅`), `-y=...`,
-`-x`, `-z`, `-x -y=...`; and disallows: `-y=... z`, `-x -y=one`, `-xz -y=one`,
+`-x`, `-z`, `-x -y=...`; and disallows: `-y=... -z`, `-x -y=one`, `-xz -y=one`,
 `-xz`.
 
 ##### `demandThisOption`
