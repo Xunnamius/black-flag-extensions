@@ -343,7 +343,7 @@ first)
 }
 ```
 
-#### Support for `default` + `conflicts` and `default` + `requires`
+#### Support for `default` + `conflicts`/`requires`
 
 <!-- TODO: fix me -->
 
