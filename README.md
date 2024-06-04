@@ -61,19 +61,6 @@ npm install @black-flag/extensions
 
 TODO
 
-#### Automatic Grouping of Related Options
-
-<!-- TODO: fix me -->
-
-Automatic grouping of related options. To support this functionality,
-`blackFlag.options(...)` and `blackFlag.option(...)` are no longer callable from
-within commands' `builder` functions. To add options to a command, they must be
-described declaratively, i.e. via returning an options object from your
-`builder` function.
-
-This feature can be disabled by passing `{ disableAutomaticGrouping: true }` to
-`withBuilderExtensions`.
-
 #### New Option Configuration Keys
 
 <!-- TODO: fix me -->
@@ -372,6 +359,19 @@ For example, the following configurations are impossible to fulfil:
   "y": {}
 }
 ```
+
+#### Automatic Grouping of Related Options
+
+<!-- TODO: fix me -->
+
+Automatic grouping of related options. To support this functionality,
+`blackFlag.options(...)` and `blackFlag.option(...)` are no longer callable from
+within commands' `builder` functions. To add options to a command, they must be
+described declaratively, i.e. via returning an options object from your
+`builder` function.
+
+This feature can be disabled by passing `{ disableAutomaticGrouping: true }` to
+`withBuilderExtensions`.
 
 ### `withUsageExtensions`
 
