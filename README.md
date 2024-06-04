@@ -89,7 +89,7 @@ This configuration will trigger a check to ensure the specified arguments, or
 argument-value pairs, are given conditioned on the existence of another
 argument. For example:
 
-```json
+```jsonc
 {
   "x": { "requires": "y" }, // ◄ Disallows x without y
   "y": {}
@@ -101,7 +101,7 @@ This configuration will trigger a check to ensure that `-y` is given whenever
 
 For example:
 
-```json
+```jsonc
 {
   // ▼ Disallows x unless y == 'one' and z is given
   "x": { "requires": [{ "y": "one" }, "z"] },
@@ -124,7 +124,7 @@ This configuration will trigger a check to ensure the specified arguments, or
 argument-value pairs, are given conditioned on the existence of another
 argument. For example:
 
-```json
+```jsonc
 {
   "x": { "conflicts": "y" }, // ◄ Disallows y if x is given
   "y": {}
@@ -136,7 +136,7 @@ whenever `-x` is given.
 
 For example:
 
-```json
+```jsonc
 {
   // ▼ Disallows y == 'one' or z if x is given
   "x": { "conflicts": [{ "y": "one" }, "z"] },
@@ -158,7 +158,7 @@ This configuration allows the following arguments: no arguments (`∅`), `-y=...
 This configuration will trigger a check to ensure the specified argument is
 given. This is equivalent to `demandOption` from vanilla yargs. For example:
 
-```json
+```jsonc
 {
   "x": { "demandThisOption": true }, // ◄ Disallows ∅, y
   "y": { "demandThisOption": false }
@@ -177,7 +177,7 @@ within groups of required options. For example:
 
 <!-- TODO: fix me -->
 
-```json
+```jsonc
 {
   "x": { "demandOption": ["y", "z"] },
   "y": { "demandOption": ["x", "z"] },
@@ -194,7 +194,7 @@ which is the same as demandOption\` except it does not accept a boolean value.
 Note that an option can be a member of an exclusivity group and an inclusive
 disjunction group simultaneously. For example:
 
-```json
+```jsonc
 {
   "x": {
     "demandThisOptionOr": ["y"],
@@ -211,7 +211,7 @@ arguments, `y`, `z`, `x` and `z`, `x` and `y` and `z`. 3. Expanded `requires`
 (formerly `implies`) and `conflicts` checks, which allow asserting conflicting
 _values_ on keys in addition to existence. For example:
 
-```json
+```jsonc
 {
   x: { requires: ["y", { z: "some-val" }] },
   y: { conflicts: { "w-2": true } },
@@ -240,7 +240,7 @@ This configuration will trigger a check to ensure the following:
 exclusivity group. Put another way, `demandThisOptionXor` enforces mutual
 exclusivity within groups of required options. For example:
 
-```json
+```jsonc
 {
   "x": { "demandThisOptionXor": ["y"] }, // ◄ Disallows ∅, z, w, xy, xyw, xyz, xyzw
   "y": { "demandThisOptionXor": ["x"] }, // ◄ Disallows ∅, z, w, xy, xyw, xyz, xyzw
@@ -265,7 +265,7 @@ Still, it is useful to note how, in that same example, the first
 mirrors the fourth. To Black Flag, they are redundant. Therefore, the following
 is equivalent.
 
-```json
+```jsonc
 {
   "x": { "demandThisOptionXor": ["y"] }, // ◄ Disallows ∅, z, w, xy, xyw, xyz, xyzw
   "y": {},
@@ -276,7 +276,7 @@ is equivalent.
 
 Here's a more complex albeit impractical example:
 
-```json
+```jsonc
 {
   "x": { "demandThisOptionXor": ["y", "z"] }, // ◄ Disallows ∅, xy, xz, yz, xyz
   "y": { "demandThisOptionXor": ["x"] }, // ◄ Disallows ∅, z, xy, xyz
@@ -290,7 +290,7 @@ arguments (`∅`), `-x`, `-z`, `-xy`, `-xz`, `-yz`, `-xyz`.
 What's more, like its sibling configurations keys, `demandThisOptionXor` also
 supports demanding argument-value pairs. For example:
 
-```json
+```jsonc
 {
   "x": { "demandThisOptionXor": { "y": "one" } },
   "y": {}
@@ -356,14 +356,14 @@ impossible to fulfil**, so care must be taken not to ask for something insane.
 
 For example, the following configurations are impossible to fulfil:
 
-```json
+```jsonc
 {
   "x": { "requires": "y" },
   "y": { "conflicts": "x" }
 }
 ```
 
-```json
+```jsonc
 {
   "x": { "requires": "y", "demandThisOptionXor": "y" },
   "y": {}
