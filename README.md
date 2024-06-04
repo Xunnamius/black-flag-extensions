@@ -36,7 +36,7 @@ greatly increase Black Flag's declarative powers.
   - [Using `demandThisOption`, `demandThisOptionIf`, `conflicts`, `requires`, and `default`](#using-demandthisoption-demandthisoptionif-conflicts-requires-and-default)
 - [Appendix](#appendix)
   - [Differences between Black Flag Extensions and Yargs](#differences-between-black-flag-extensions-and-yargs)
-  - [@black-Flag/extensions Vs @black-Flag/core](#black-flagextensions-vs-black-flagcore)
+  - [Black Flag versus Black Flag Extensions](#black-flag-versus-black-flag-extensions)
   - [Published Package Details](#published-package-details)
   - [License](#license)
 - [Contributing and Support](#contributing-and-support)
@@ -57,9 +57,13 @@ npm install @black-flag/extensions
 
 ### `withBuilderExtensions`
 
+<!-- TODO: fix me -->
+
 TODO
 
 #### Automatic Grouping of Related Options
+
+<!-- TODO: fix me -->
 
 Automatic grouping of related options. To support this functionality,
 `blackFlag.options(...)` and `blackFlag.option(...)` are no longer callable from
@@ -67,13 +71,12 @@ within commands' `builder` functions. To add options to a command, they must be
 described declaratively, i.e. via returning an options object from your
 `builder` function.
 
-Note that working around this feature's limitations will result in undefined and
-potentially dangerous behavior.
-
-On the other hand, this feature can be disabled by passing
-`{ disableAutomaticGrouping: true }` to `withBuilderExtensions`.
+This feature can be disabled by passing `{ disableAutomaticGrouping: true }` to
+`withBuilderExtensions`.
 
 #### New Option Configuration Keys
+
+<!-- TODO: fix me -->
 
 TODO
 
@@ -174,6 +177,8 @@ This configuration will trigger a check to ensure that `-x` is given.
 `demandThisOptionOr` enables non-optional inclusive disjunction checks per
 group. Put another way, `demandThisOptionOr` enforces a "logical or" relation
 within groups of required options. For example:
+
+<!-- TODO: fix me -->
 
 ```json
 {
@@ -300,14 +305,21 @@ disallows: no arguments (`∅`), `-y=...`.
 
 ##### `demandThisOptionIf`
 
+<!-- TODO: fix me -->
+
 TODO
 
 ##### `subOptionOf`
 
+<!-- TODO: fix me -->
+
 TODO (reconfigure option depending on values of other options; overlap = merged
 with latest definitions winning)
 
-TODO: happens on second parse, not first (normal config happens on first)
+<!-- TODO: fix me -->
+
+TODO: happens on second parse, not first (normal "fallback" config happens on
+first)
 
 ```javascript
 {
@@ -336,7 +348,9 @@ TODO: happens on second parse, not first (normal config happens on first)
 
 #### Support for `default` + `conflicts` and `default` + `requires`
 
-TODO: footgun avoided
+<!-- TODO: fix me -->
+
+TODO: footgun avoided for free
 
 #### Impossible Configurations
 
@@ -361,13 +375,19 @@ For example, the following configurations are impossible to fulfil:
 
 ### `withUsageExtensions`
 
+<!-- TODO: fix me -->
+
 TODO
 
 ## Examples
 
+<!-- TODO: fix me -->
+
 TODO
 
 ### Using `demandThisOption`, `demandThisOptionIf`, `conflicts`, `requires`, and `default`
+
+<!-- TODO: fix me -->
 
 Suppose we wanted a "deploy" command with the following features:
 
@@ -435,8 +455,6 @@ export default function command({ state }: CustomExecutionContext) {
       },
       host: {
         string: true,
-        // ▼ Inverse of { requires: { target: 'ssh' }} (equivalent in this example)
-        //conflicts: { target: 'vercel' }, // ◄ Error if --target=vercel
         // ▼ Inverse of { conflicts: { target: 'vercel' }} (equivalent in this example)
         requires: { target: 'ssh' }, // ◄ Error if --target != ssh
         demandThisOptionIf: { target: 'ssh' }, // ◄ Demand --host if --target=ssh
@@ -479,10 +497,16 @@ export default function command({ state }: CustomExecutionContext) {
 
 #### Example Outputs
 
+<!-- TODO: fix me -->
+
 TODO: takes advantage of dynamic options support! Better help text with
 requires + demandThisOptionIf
 
+<!-- TODO: fix me -->
+
 TODO: demandThisOptionIf + demandOption + others and how they overlap
+
+<!-- TODO: fix me -->
 
 TODO: python example again?
 
@@ -530,13 +554,10 @@ export function builder(blackFlag) {
 }
 ```
 
-In addition, the following yargs [`opt` keys][9] are soft-disabled via
-intellisense:
+> The yargs API can still be invoked for purposes other than defining options on
+> a command, e.g. `blackFlag.strict(false)`.
 
-- `implies`
-- `demandOption`
-
-Similarly, the following [yargs API functions][10] are soft-disabled via
+To this end, the following [yargs API functions][10] are soft-disabled via
 intellisense:
 
 - `option`
@@ -545,9 +566,9 @@ intellisense:
 However, no attempt is made by BFE to restrict your use of the yargs API at
 runtime. Therefore, using yargs's API to work around these artificial
 limitations, e.g. in your command's [`builder`][11] function or via the
-[`configureExecutionPrologue`][12] hook, will result in undefined behavior.
+[`configureExecutionPrologue`][12] hook, will result in **undefined behavior**.
 
-### @black-Flag/extensions Vs @black-Flag/core
+### Black Flag versus Black Flag Extensions
 
 The goal of [Black Flag (@black-flag/core)][13] is to be as close to a drop-in
 replacement as possible for vanilla yargs, specifically for users of
@@ -721,7 +742,7 @@ specification. Contributions of any kind welcome!
 [x-repo-sponsor]: https://github.com/sponsors/Xunnamius
 [x-repo-support]: /.github/SUPPORT.md
 [1]: https://github.com/yargs/yargs/issues
-[2]: #black-flagextensions-vs-black-flagcore
+[2]: #black-flag-versus-black-flag-extensions
 [3]: #differences-between-black-flag-extensions-and-yargs
 [4]: https://yargs.js.org/docs#implies
 [5]: #conflicts
