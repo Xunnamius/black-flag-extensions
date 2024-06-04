@@ -586,7 +586,7 @@ replacement as possible for vanilla yargs, specifically for users of
 maintain 1:1 parity with the vanilla yargs API ([with a few minor
 exceptions][20]).
 
-This means yargs's imperative nature tends to leak through Black Flag's
+As a consequence, yargs's imperative nature tends to leak through Black Flag's
 abstraction at certain points, such as with [the `blackFlag` parameter of the
 `builder` export][16]. **This is a good thing!** Since we want access to all of
 yargs's killer features without Black Flag getting in the way.
