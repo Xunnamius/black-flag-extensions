@@ -128,6 +128,9 @@ functionality beyond that offered by vanilla yargs and Black Flag:
 | [`check`][12]               | N/A                             |
 | [`subOptionOf`][13]         | N/A                             |
 
+Keep in mind that, except where noted, the checks enabled by these keys are run
+on Black Flag's [second parsing pass][19].
+
 ##### `requires`
 
 > `requires` is a superset of and replacement for vanilla yargs's
@@ -362,8 +365,9 @@ This configuration allows the following arguments: `‑x`, `‑y=one`, `‑z`,
 ##### `check`
 
 `check` is declarative sugar around [`yargs::check()`][18] that is applied
-specifically to the option being configured. These option-specific custom check
-functions are run on Black Flag's [second parsing pass][19].
+specifically to the option being configured. As with its sibling configuration
+extensions, option-specific custom check functions are run on Black Flag's
+[second parsing pass][19].
 
 When a check fails, execution of its command's handler function will cease and
 [`configureErrorHandlingEpilogue`][20] will be invoked (unless you threw a
