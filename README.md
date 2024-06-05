@@ -203,8 +203,8 @@ This configuration allows the following arguments: no arguments (`∅`), `‑y=.
 > `{ P: { demandThisOptionIf: [Q, R] }}` can be read as `Q ∨ R ⟹ P` or
 > `P ∨ ¬Q ∧ ¬R`, with truth values denoting existence.
 
-`demandThisOptionIf` enables checks to ensure the specified option is given when
-at least one of a group of arguments, or argument-value pairs, is also given.
+`demandThisOptionIf` enables checks to ensure an argument is given when at least
+one of the specified group of arguments, or argument-value pairs, is also given.
 
 For example:
 
@@ -245,8 +245,8 @@ This configuration allows the following arguments: no arguments (`∅`), `‑x`,
 > `{ P: { demandThisOption: true }}` can be read as `P`, with truth values
 > denoting existence.
 
-`demandThisOption` enables checks to ensure the specified argument is given.
-This is equivalent to `demandOption` from vanilla yargs. For example:
+`demandThisOption` enables checks to ensure an argument is always given. This is
+equivalent to `demandOption` from vanilla yargs. For example:
 
 ```jsonc
 {
