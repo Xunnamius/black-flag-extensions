@@ -107,21 +107,28 @@ export default function command({ state }) {
 The following new configuration keys enable additional options-related units of
 functionality beyond that offered by vanilla yargs and Black Flag:
 
-- [`requires`][5]
-- [`conflicts`][6]
-- [`demandThisOption`][7]
-- [`demandThisOptionOr`][8]
-- [`demandThisOptionXor`][9]
-- [`demandThisOptionIf`][10]
-- [`subOptionOf`][11]
+> In the below definitions, `P`, `Q`, and `R` are arguments configured via
+> [`blackFlag.options({ P: { [key]: [Q, R] }})`][5].
+
+| Key                         | Definition                      |
+| :-------------------------- | :------------------------------ |
+| [`requires`][6]             | `P ⟹ Q ∧ R` or `¬P ∨ Q ∧ R`     |
+| [`conflicts`][7]            | `P ⟹ ¬Q ∧ ¬R` or `¬P ∨ ¬Q ∧ ¬R` |
+| [`demandThisOptionIf`][8]   | `Q ∨ R ⟹ P` or `P ∨ ¬Q ∧ ¬R`    |
+| [`demandThisOption`][9]     | `P`                             |
+| [`demandThisOptionOr`][10]  | `P ∨ Q ∨ R`                     |
+| [`demandThisOptionXor`][11] | `P ⊕ Q ⊕ R`                     |
+| [`subOptionOf`][12]         | N/A                             |
 
 ##### `requires`
 
 > `requires` is a superset of and replacement for vanilla yargs's
-> [`implies`][12]. However, `implies` is not disallowed by intellisense. If both
-> are specified, they will both be considered by Black Flag and yargs.
+> [`implies`][13]. However, `implies` is not disallowed by intellisense. If both
+> are specified, they will both be considered by Black Flag (and yargs). It is
+> recommended to avoid `implies` entirely [due to its ambiguity][14].
 
-> `requires` is the inverse of [`conflicts`][6].
+> `{ P: { requires: [Q, R] }}` can be read as `P ⟹ Q ∧ R` or `¬P ∨ Q ∧ R`, with
+> truth values denoting existence.
 
 `requires` enables checks to ensure the specified arguments, or argument-value
 pairs, are given conditioned on the existence of another argument. For example:
@@ -133,8 +140,8 @@ pairs, are given conditioned on the existence of another argument. For example:
 }
 ```
 
-This configuration will trigger a check to ensure that `-y` is given whenever
-`-x` is given.
+This configuration will trigger a check to ensure that `‑y` is given whenever
+`‑x` is given.
 
 `requires` also supports checks against the parsed _values_ of arguments in
 addition to the mere argument existence checks demonstrated above. For example:
@@ -148,15 +155,16 @@ addition to the mere argument existence checks demonstrated above. For example:
 }
 ```
 
-This configuration allows the following arguments: no arguments (`∅`), `-y=...`,
-`-y=... -z`, `-xz -y=one`; and disallows: `-x`, `-z`, `-x -y=...`, `-xz -y=...`,
-`-xz`.
+This configuration allows the following arguments: no arguments (`∅`), `‑y=...`,
+`‑y=... ‑z`, `‑xz ‑y=one`; and disallows: `‑x`, `‑z`, `‑x ‑y=...`, `‑xz ‑y=...`,
+`‑xz`.
 
 ##### `conflicts`
 
-> `conflicts` is a superset of vanilla yargs's [`conflicts`][13].
+> `conflicts` is a superset of vanilla yargs's [`conflicts`][15].
 
-> `conflicts` is the inverse of [`requires`][5].
+> `{ P: { conflicts: [Q, R] }}` can be read as `P ⟹ ¬Q ∧ ¬R` or `¬P ∨ ¬Q ∧ ¬R`,
+> with truth values denoting existence.
 
 `conflicts` enables checks to ensure the specified arguments, or argument-value
 pairs, are given conditioned on the existence of another argument. For example:
@@ -168,8 +176,8 @@ pairs, are given conditioned on the existence of another argument. For example:
 }
 ```
 
-This configuration will trigger a check to ensure that `-y` is never given
-whenever `-x` is given.
+This configuration will trigger a check to ensure that `‑y` is never given
+whenever `‑x` is given.
 
 `conflicts` also supports checks against the parsed _values_ of arguments in
 addition to the mere argument existence checks demonstrated above. For example:
@@ -183,15 +191,58 @@ addition to the mere argument existence checks demonstrated above. For example:
 }
 ```
 
-This configuration allows the following arguments: no arguments (`∅`), `-y=...`,
-`-x`, `-z`, `-x -y=...`; and disallows: `-y=... -z`, `-x -y=one`, `-xz -y=one`,
-`-xz`.
+This configuration allows the following arguments: no arguments (`∅`), `‑y=...`,
+`‑x`, `‑z`, `‑x ‑y=...`; and disallows: `‑y=... ‑z`, `‑x ‑y=one`, `‑xz ‑y=one`,
+`‑xz`.
+
+##### `demandThisOptionIf`
+
+> `demandThisOptionIf` is a superset of vanilla yargs's [`demandOption`][16].
+
+> `{ P: { demandThisOptionIf: [Q, R] }}` can be read as `Q ∨ R ⟹ P` or
+> `P ∨ ¬Q ∧ ¬R`, with truth values denoting existence.
+
+`demandThisOptionIf` enables checks to ensure the specified option is given when
+at least one of a group of arguments, or argument-value pairs, is also given.
+
+For example:
+
+```jsonc
+{
+  "x": {},
+  "y": { "demandThisOptionIf": "x" }, // ◄ Demands y if x is given
+  "z": { "demandThisOptionIf": "x" } // ◄ Demands z if x is given
+}
+```
+
+This configuration allows the following arguments: no arguments (`∅`), `‑y`,
+`‑z`, `‑yz`, `‑xyz`; and disallows: `‑x`, `‑xy`, `‑xz`.
+
+`demandThisOptionIf` also supports checks against the parsed _values_ of
+arguments in addition to the mere argument existence checks demonstrated above.
+For example:
+
+```jsonc
+{
+  // ▼ Demands x if y == 'one' or z is given
+  "x": { "demandThisOptionIf": [{ "y": "one" }, "z"] },
+  "y": {},
+  "z": {}
+}
+```
+
+This configuration allows the following arguments: no arguments (`∅`), `‑x`,
+`‑y=...`, `‑x ‑y=...`, `‑xz`, `‑y=... ‑z`, `-xz y=...`; and disallows: `‑z`,
+`‑y=one`, `‑y=one ‑z`.
 
 ##### `demandThisOption`
 
-> `demandThisOption` is an alias of vanilla yargs's [`demandOption`][14].
+> `demandThisOption` is an alias of vanilla yargs's [`demandOption`][16].
 > However, `demandOption` is not disallowed by intellisense. If both are
 > specified, the configuration defined last will win.
+
+> `{ P: { demandThisOption: true }}` can be read as `P`, with truth values
+> denoting existence.
 
 `demandThisOption` enables checks to ensure the specified argument is given.
 This is equivalent to `demandOption` from vanilla yargs. For example:
@@ -203,11 +254,14 @@ This is equivalent to `demandOption` from vanilla yargs. For example:
 }
 ```
 
-This configuration will trigger a check to ensure that `-x` is given.
+This configuration will trigger a check to ensure that `‑x` is given.
 
 ##### `demandThisOptionOr`
 
-> `demandThisOptionOr` is a superset of vanilla yargs's [`demandOption`][14].
+> `demandThisOptionOr` is a superset of vanilla yargs's [`demandOption`][16].
+
+> `{ P: { demandThisOptionOr: [Q, R] }}` can be read as `P ∨ Q ∨ R`, with truth
+> values denoting existence.
 
 `demandThisOptionOr` enables non-optional inclusive disjunction checks per
 group. Put another way, `demandThisOptionOr` enforces a "logical or" relation
@@ -223,7 +277,7 @@ within groups of required options. For example:
 
 This configuration will trigger a check to ensure _at least one_ of `x`, `y`, or
 `z` is given. In other words, this configuration allows the following arguments:
-`-x`, `-y`, `-z`, `-xy`, `-xz`, `-yz`, `-xyz`; and disallows: no arguments
+`‑x`, `‑y`, `‑z`, `‑xy`, `‑xz`, `‑yz`, `‑xyz`; and disallows: no arguments
 (`∅`).
 
 In the interest of readability, consider mirroring the appropriate
@@ -244,14 +298,17 @@ For example:
 }
 ```
 
-This configuration allows the following arguments: `-x`, `-y=one`, `-z`,
-`-x -y=...`, `-xz`, `-y=... -z`, `-xz -y=...`; and disallows: no arguments
-(`∅`), `-y=...`.
+This configuration allows the following arguments: `‑x`, `‑y=one`, `‑z`,
+`‑x ‑y=...`, `‑xz`, `‑y=... ‑z`, `‑xz ‑y=...`; and disallows: no arguments
+(`∅`), `‑y=...`.
 
 ##### `demandThisOptionXor`
 
-> `demandThisOptionXor` is a superset of vanilla yargs's [`demandOption`][14] +
-> [`conflicts`][13].
+> `demandThisOptionXor` is a superset of vanilla yargs's [`demandOption`][16] +
+> [`conflicts`][15].
+
+> `{ P: { demandThisOptionXor: [Q, R] }}` can be read as `P ⊕ Q ⊕ R`, with truth
+> values denoting existence.
 
 `demandThisOptionXor` enables non-optional exclusive disjunction checks per
 exclusivity group. Put another way, `demandThisOptionXor` enforces mutual
@@ -266,11 +323,11 @@ exclusivity within groups of required options. For example:
 }
 ```
 
-This configuration will trigger a check to ensure _exactly one_ of `-x` or `-y`
-is given, and _exactly one_ of `-z` or `-w` is given. In other words, this
-configuration allows the following arguments: `-xz`, `-xw`, `-yz`, `-yw`; and
-disallows: no arguments (`∅`), `-x`, `-y`, `-z`, `-w`, `-xy`, `-zw`, `-xyz`,
-`-xyw`, `-xzw`, `-yzw`, `-xyzw`.
+This configuration will trigger a check to ensure _exactly one_ of `‑x` or `‑y`
+is given, and _exactly one_ of `‑z` or `‑w` is given. In other words, this
+configuration allows the following arguments: `‑xz`, `‑xw`, `‑yz`, `‑yw`; and
+disallows: no arguments (`∅`), `‑x`, `‑y`, `‑z`, `‑w`, `‑xy`, `‑zw`, `‑xyz`,
+`‑xyw`, `‑xzw`, `‑yzw`, `‑xyzw`.
 
 In the interest of readability, consider mirroring the appropriate
 `demandThisOptionXor` configuration to the other relevant options, though this
@@ -290,91 +347,9 @@ For example:
 }
 ```
 
-This configuration allows the following arguments: `-x`, `-y=one`, `-z`,
-`-x -y=...`, `-y=... -z`; and disallows: no arguments (`∅`), `-y=...`,
-`-x -y=one`, `-xz`, `-y=one -z`, `-xz -y=...`.
-
-##### `demandThisOptionIf`
-
-> `demandThisOptionIf` is a superset of vanilla yargs's [`demandOption`][14].
-
-`demandThisOptionIf` enables checks to ensure that when at least one of the
-specified arguments, or argument-value pairs, are given, this option must also
-be given. This is very similar to [`requires`][5], except the dependency
-relation is inverted.
-
-For example, consider the following:
-
-```jsonc
-{
-  "x": { "requires": ["y", "z"] }, // ◄ Disallows x without y and z
-  "y": {},
-  "z": {}
-}
-```
-
-```jsonc
-{
-  "x": {},
-  "y": { "demandThisOptionIf": "x" }, // ◄ Demands y if x is given
-  "z": { "demandThisOptionIf": "x" } // ◄ Demands z if x is given
-}
-```
-
-The former configuration allows the following arguments: no arguments (`∅`),
-`-y`, `-z`, `-yz`, `-xyz`; and disallows: `-x`, `-xy`, `-xz`.
-
-While the latter configuration allows the following arguments: no arguments
-(`∅`), `-y`, `-z`, `-yz`, `-xyz`; and disallows: `-x`, `-xy`, `-xz`.
-
-The utility of `demandThisOptionIf` (versus [`requires`][5] or
-[`demandThisOptionOr`][8]) becomes apparent when checking against the parsed
-_values_ of arguments rather than the mere argument existence checks
-demonstrated above. For example:
-
-```jsonc
-{
-  // ▼ Disallows x unless y == 'one' and z is given
-  "x": { "requires": [{ "y": "one" }, "z"] },
-  "y": {},
-  "z": { "requires": "y" } // ◄ Disallows z unless y is given
-}
-```
-
-Versus:
-
-```jsonc
-{
-  // ▼ Demands x or y == 'one' or z
-  "x": { "demandThisOptionOr": [{ "y": "one" }, "z"] },
-  "y": {},
-  // ▼ Demands z or y
-  "z": { "demandThisOptionOr": "y" }
-}
-```
-
-Versus:
-
-```jsonc
-{
-  "x": {},
-  "y": { "demandThisOptionIf": "x" }, // ◄ Demands y if x is given
-  // ▼ Demands z if x or y == one are given
-  "z": { "demandThisOptionIf": ["x", { "y": "one" }] }
-}
-```
-
-The first configuration allows the following arguments: no arguments (`∅`),
-`-y=...`, `-y=... -z`, `-xz -y=one`; and disallows: `-x`, `-z`, `-x -y=...`,
-`-xz`, `-xz -y=...`.
-
-The second configuration allows the following arguments: `-y=one`, `-z`,
-`-x -y=...`, `-xz`, `-y=... -z`, `-xz -y=...`; and disallows: no arguments
-(`∅`), `-x`, `-y=...`.
-
-While the final configuration allows the following arguments: no arguments
-(`∅`), `-y=...`, `-z`, `-y=... -z`, `-xz -y=one`; and disallows: `-x`, `-y=one`,
-`-x -y=...`, `-xz`, `-xz -y=...`.
+This configuration allows the following arguments: `‑x`, `‑y=one`, `‑z`,
+`‑x ‑y=...`, `‑y=... ‑z`; and disallows: no arguments (`∅`), `‑y=...`,
+`‑x ‑y=one`, `‑xz`, `‑y=one ‑z`, `‑xz ‑y=...`.
 
 ##### `subOptionOf`
 
@@ -413,7 +388,57 @@ first)
 }
 ```
 
-#### Support for `default` with `conflicts`/`requires`
+#### `requires` versus `demandThisOptionIf`
+
+The utility of [`demandThisOptionIf`][8] versus [`requires`][6] (and
+[`demandThisOptionOr`][10]) becomes apparent when checking against multiple
+arguments. For example:
+
+```jsonc
+{
+  // ▼ Demands y == 'one' and z if x is given
+  "x": { "requires": [{ "y": "one" }, "z"] },
+  "y": {},
+  "z": { "requires": "y" } // ◄ Demands y if z is given
+}
+```
+
+Versus:
+
+```jsonc
+{
+  // ▼ Demands x or y == 'one' or z
+  "x": { "demandThisOptionOr": [{ "y": "one" }, "z"] },
+  "y": {},
+  // ▼ Demands z or y
+  "z": { "demandThisOptionOr": "y" }
+}
+```
+
+Versus:
+
+```jsonc
+{
+  "x": {},
+  "y": { "demandThisOptionIf": "x" }, // ◄ Demands y if x is given
+  // ▼ Demands z if x or y == one are given
+  "z": { "demandThisOptionIf": ["x", { "y": "one" }] }
+}
+```
+
+The first `requires` configuration allows the following arguments: no arguments
+(`∅`), `‑y=...`, `‑y=... ‑z`, `‑xz ‑y=one`; and disallows: `‑x`, `‑z`,
+`‑x ‑y=...`, `‑xz`, `‑xz ‑y=...`.
+
+The second `demandThisOptionOr` configuration allows the following arguments:
+`‑y=one`, `‑z`, `‑x ‑y=...`, `‑xz`, `‑y=... ‑z`, `‑xz ‑y=...`; and disallows: no
+arguments (`∅`), `‑x`, `‑y=...`.
+
+While the final `demandThisOptionIf` configuration allows the following
+arguments: no arguments (`∅`), `‑y=...`, `‑z`, `‑y=... ‑z`, `‑xz ‑y=one`; and
+disallows: `‑x`, `‑y=one`, `‑x ‑y=...`, `‑xz`, `‑xz ‑y=...`.
+
+#### Support for `default` with `conflicts`/`requires` Et Al
 
 <!-- TODO: fix me -->
 
@@ -535,7 +560,7 @@ export default function command({ state }: CustomExecutionContext) {
       },
       host: {
         string: true,
-        // ▼ Inverse of { conflicts: { target: 'vercel' }} (equivalent in this example)
+        // ▼ Inverse of { conflicts: { target: 'vercel' }} in this example
         requires: { target: 'ssh' }, // ◄ Error if --target != ssh
         demandThisOptionIf: { target: 'ssh' }, // ◄ Demand --host if --target=ssh
         description: 'The host to use'
@@ -597,7 +622,7 @@ Further documentation can be found under [`docs/`][x-repo-docs].
 ### Differences between Black Flag Extensions and Yargs
 
 When using BFE, command options must be configured by [returning an `opt`
-object][15] from your command's `builder` rather than imperatively invoking the
+object][5] from your command's `builder` rather than imperatively invoking the
 yargs API.
 
 For example:
@@ -637,7 +662,7 @@ export function builder(blackFlag) {
 > The yargs API can still be invoked for purposes other than defining options on
 > a command, e.g. `blackFlag.strict(false)`.
 
-To this end, the following [yargs API functions][16] are soft-disabled via
+To this end, the following [yargs API functions][17] are soft-disabled via
 intellisense:
 
 - `option`
@@ -645,27 +670,27 @@ intellisense:
 
 However, no attempt is made by BFE to restrict your use of the yargs API at
 runtime. Therefore, using yargs's API to work around these artificial
-limitations, e.g. in your command's [`builder`][17] function or via the
-[`configureExecutionPrologue`][18] hook, will result in **undefined behavior**.
+limitations, e.g. in your command's [`builder`][18] function or via the
+[`configureExecutionPrologue`][19] hook, will result in **undefined behavior**.
 
 ### Black Flag versus Black Flag Extensions
 
-The goal of [Black Flag (@black-flag/core)][19] is to be as close to a drop-in
+The goal of [Black Flag (@black-flag/core)][20] is to be as close to a drop-in
 replacement as possible for vanilla yargs, specifically for users of
-[`yargs::commandDir()`][20]. This means Black Flag must go out of its way to
+[`yargs::commandDir()`][21]. This means Black Flag must go out of its way to
 maintain 1:1 parity with the vanilla yargs API ([with a few minor
-exceptions][21]).
+exceptions][22]).
 
 As a consequence, yargs's imperative nature tends to leak through Black Flag's
 abstraction at certain points, such as with [the `blackFlag` parameter of the
-`builder` export][17]. **This is a good thing!** Since we want access to all of
+`builder` export][18]. **This is a good thing!** Since we want access to all of
 yargs's killer features without Black Flag getting in the way.
 
 However, this comes with costs. For one, the yargs's API has suffered from a bit
-of feature creep over the years. A result of this is a rigid API [with][22]
-[an][23] [abundance][24] [of][25] [footguns][26] and an [inability][27] to
-[address][28] them without introducing [massively][29] [breaking][30]
-[changes][31].
+of feature creep over the years. A result of this is a rigid API [with][23]
+[an][24] [abundance][25] [of][26] [footguns][27] and an [inability][28] to
+[address][29] them without introducing [massively][30] [breaking][31]
+[changes][32].
 
 BFE takes the "YOLO" approach by exporting several functions that build on top
 of Black Flag's feature set without worrying too much about maintaining 1:1
@@ -825,33 +850,34 @@ specification. Contributions of any kind welcome!
 [2]: #black-flag-versus-black-flag-extensions
 [3]: #differences-between-black-flag-extensions-and-yargs
 [4]: ./docs/functions/withBuilderExtensions.md
-[5]: #requires
-[6]: #conflicts
-[7]: #demandthisoption
-[8]: #demandthisoptionor
-[9]: #demandthisoptionxor
-[10]: #demandthisoptionif
-[11]: #subOptionOf
-[12]: https://yargs.js.org/docs#implies
-[13]: https://yargs.js.org/docs#conflicts
-[14]: https://yargs.js.org/docs#demandOption
-[15]: https://yargs.js.org/docs#api-reference-optionskey-opt
-[16]: https://yargs.js.org/docs#api-reference
-[17]:
-  https://github.com/Xunnamius/black-flag/blob/main/docs/index/type-aliases/Configuration.md#builder
+[5]: https://yargs.js.org/docs#api-reference-optionskey-opt
+[6]: #requires
+[7]: #conflicts
+[8]: #demandthisoptionif
+[9]: #demandthisoption
+[10]: #demandthisoptionor
+[11]: #demandthisoptionxor
+[12]: #subOptionOf
+[13]: https://yargs.js.org/docs#implies
+[14]: https://github.com/yargs/yargs/issues/1322#issuecomment-1538709884
+[15]: https://yargs.js.org/docs#conflicts
+[16]: https://yargs.js.org/docs#demandOption
+[17]: https://yargs.js.org/docs#api-reference
 [18]:
+  https://github.com/Xunnamius/black-flag/blob/main/docs/index/type-aliases/Configuration.md#builder
+[19]:
   https://github.com/Xunnamius/black-flag/blob/main/docs/index/type-aliases/ConfigureExecutionPrologue.md
-[19]: https://npm.im/@black-flag/core
-[20]: https://yargs.js.org/docs#api-reference-commanddirdirectory-opts
-[21]:
+[20]: https://npm.im/@black-flag/core
+[21]: https://yargs.js.org/docs#api-reference-commanddirdirectory-opts
+[22]:
   https://github.com/Xunnamius/black-flag?tab=readme-ov-file#differences-between-black-flag-and-yargs
-[22]: https://github.com/yargs/yargs/issues/1323
-[23]: https://github.com/yargs/yargs/issues/1442
-[24]: https://github.com/yargs/yargs/issues/2340
-[25]: https://github.com/yargs/yargs/issues/1322
-[26]: https://github.com/yargs/yargs/issues/2089
-[27]: https://github.com/yargs/yargs/issues/1975
-[28]: https://github.com/yargs/yargs-parser/issues/412
-[29]: https://github.com/yargs/yargs/issues/1680
-[30]: https://github.com/yargs/yargs/issues/1599
-[31]: https://github.com/yargs/yargs/issues/1611
+[23]: https://github.com/yargs/yargs/issues/1323
+[24]: https://github.com/yargs/yargs/issues/1442
+[25]: https://github.com/yargs/yargs/issues/2340
+[26]: https://github.com/yargs/yargs/issues/1322
+[27]: https://github.com/yargs/yargs/issues/2089
+[28]: https://github.com/yargs/yargs/issues/1975
+[29]: https://github.com/yargs/yargs-parser/issues/412
+[30]: https://github.com/yargs/yargs/issues/1680
+[31]: https://github.com/yargs/yargs/issues/1599
+[32]: https://github.com/yargs/yargs/issues/1611
