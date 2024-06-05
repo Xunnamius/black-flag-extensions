@@ -61,7 +61,7 @@ npm install @black-flag/extensions
 
 This function enables several additional options-related units of functionality
 via analysis of the returned options configuration object and the parsed command
-line arguments (argv).
+line arguments (i.e. `argv`).
 
 Note that options provided to configuration keys like `demandThisOptionXor` are
 represented by their exact names as defined (e.g. `'my-argument'`) and not their
