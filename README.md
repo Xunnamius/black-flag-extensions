@@ -500,8 +500,8 @@ Options:
 ```
 
 Ideally, Black Flag would allow us to describe the relationship between `--lang`
-and `--version` _declaratively_, without having to drop down to imperative
-interactions with the yargs API like we did above.
+and its _suboption_ `--version` declaratively, without having to drop down to
+imperative interactions with the yargs API like we did above.
 
 This is the goal of the `subOptionOf` configuration key. Using `subOptionOf`,
 developers can take advantage of dynamic options without sweating the
