@@ -12,15 +12,23 @@
 
 # @black-flag/extensions
 
-Black Flag Extensions (AKA: @black-flag/extensions, BFE) is a collection of
-high-order functions that wrap your commands' exports to provide a bevy of new
-declarative features, some of which are heavily inspired by [yargs's GitHub
-Issues reports][1].
+Black Flag Extensions (BFE) is a collection of high-order functions that wrap
+Black Flag commands' exports to provide a bevy of new declarative features, some
+of which are heavily inspired by [yargs's GitHub Issues reports][1]. It's like
+type-fest or jest-extended, but for Black Flag and yargs!
 
-If you're willing to stray a bit from the vanilla yargs API, you can use BFE to
-greatly increase Black Flag's declarative powers.
+The goal of these extensions is to collect validation behavior that I find
+myself constantly re-implementing while also standardizing my workarounds for a
+few of yargs's rough edges. That said, it's important to note that BFE does not
+represent a complete propositional logic and so cannot describe every possible
+relation between arguments. Nor should it; BFE makes it easy to fall back to
+using the yargs API imperatively when required.
 
-> [Why are @black-flag/extensions and @black-flag/core separate packages?][2]
+In exchange for straying a bit from the vanilla yargs API, BFE greatly increases
+Black Flag's declarative powers.
+
+> See also: [why are @black-flag/extensions and @black-flag/core separate
+> packages?][2]
 
 ---
 
@@ -129,14 +137,16 @@ functionality beyond that offered by vanilla yargs and Black Flag:
 | [`subOptionOf`][13]         | N/A                             |
 
 Keep in mind that, except where noted, the checks enabled by these keys are run
-on Black Flag's [second parsing pass][19].
+on Black Flag's [second parsing pass][14].
+
+---
 
 ##### `requires`
 
 > `requires` is a superset of and replacement for vanilla yargs's
-> [`implies`][14]. However, `implies` is not disallowed by intellisense. If both
+> [`implies`][15]. However, `implies` is not disallowed by intellisense. If both
 > are specified, they will both be considered by Black Flag (and yargs). It is
-> recommended to avoid `implies` entirely [due to its ambiguity][15].
+> recommended to avoid `implies` entirely [due to its ambiguity][16].
 
 > `{ P: { requires: [Q, R] }}` can be read as `P ⟹ Q ∧ R` or `¬P ∨ Q ∧ R`, with
 > truth values denoting existence.
@@ -170,9 +180,11 @@ This configuration allows the following arguments: no arguments (`∅`), `‑y=.
 `‑y=... ‑z`, `‑xz ‑y=one`; and disallows: `‑x`, `‑z`, `‑x ‑y=...`, `‑xz ‑y=...`,
 `‑xz`.
 
+---
+
 ##### `conflicts`
 
-> `conflicts` is a superset of vanilla yargs's [`conflicts`][16].
+> `conflicts` is a superset of vanilla yargs's [`conflicts`][17].
 
 > `{ P: { conflicts: [Q, R] }}` can be read as `P ⟹ ¬Q ∧ ¬R` or `¬P ∨ ¬Q ∧ ¬R`,
 > with truth values denoting existence.
@@ -207,9 +219,11 @@ This configuration allows the following arguments: no arguments (`∅`), `‑y=.
 `‑x`, `‑z`, `‑x ‑y=...`; and disallows: `‑y=... ‑z`, `‑x ‑y=one`, `‑xz ‑y=one`,
 `‑xz`.
 
+---
+
 ##### `demandThisOptionIf`
 
-> `demandThisOptionIf` is a superset of vanilla yargs's [`demandOption`][17].
+> `demandThisOptionIf` is a superset of vanilla yargs's [`demandOption`][18].
 
 > `{ P: { demandThisOptionIf: [Q, R] }}` can be read as `Q ∨ R ⟹ P` or
 > `P ∨ ¬Q ∧ ¬R`, with truth values denoting existence.
@@ -248,9 +262,11 @@ This configuration allows the following arguments: no arguments (`∅`), `‑x`,
 `‑y=...`, `‑x ‑y=...`, `‑xz`, `‑y=... ‑z`, `-xz y=...`; and disallows: `‑z`,
 `‑y=one`, `‑y=one ‑z`.
 
+---
+
 ##### `demandThisOption`
 
-> `demandThisOption` is an alias of vanilla yargs's [`demandOption`][17].
+> `demandThisOption` is an alias of vanilla yargs's [`demandOption`][18].
 > However, `demandOption` is not disallowed by intellisense. If both are
 > specified, the configuration defined last will win.
 
@@ -269,9 +285,11 @@ equivalent to `demandOption` from vanilla yargs. For example:
 
 This configuration will trigger a check to ensure that `‑x` is given.
 
+---
+
 ##### `demandThisOptionOr`
 
-> `demandThisOptionOr` is a superset of vanilla yargs's [`demandOption`][17].
+> `demandThisOptionOr` is a superset of vanilla yargs's [`demandOption`][18].
 
 > `{ P: { demandThisOptionOr: [Q, R] }}` can be read as `P ∨ Q ∨ R`, with truth
 > values denoting existence.
@@ -315,10 +333,12 @@ This configuration allows the following arguments: `‑x`, `‑y=one`, `‑z`,
 `‑x ‑y=...`, `‑xz`, `‑y=... ‑z`, `‑xz ‑y=...`; and disallows: no arguments
 (`∅`), `‑y=...`.
 
+---
+
 ##### `demandThisOptionXor`
 
-> `demandThisOptionXor` is a superset of vanilla yargs's [`demandOption`][17] +
-> [`conflicts`][16].
+> `demandThisOptionXor` is a superset of vanilla yargs's [`demandOption`][18] +
+> [`conflicts`][17].
 
 > `{ P: { demandThisOptionXor: [Q, R] }}` can be read as `P ⊕ Q ⊕ R`, with truth
 > values denoting existence.
@@ -364,12 +384,14 @@ This configuration allows the following arguments: `‑x`, `‑y=one`, `‑z`,
 `‑x ‑y=...`, `‑y=... ‑z`; and disallows: no arguments (`∅`), `‑y=...`,
 `‑x ‑y=one`, `‑xz`, `‑y=one ‑z`, `‑xz ‑y=...`.
 
+---
+
 ##### `check`
 
-`check` is declarative sugar around [`yargs::check()`][18] that is applied
+`check` is declarative sugar around [`yargs::check()`][19] that is applied
 specifically to the option being configured. As with its sibling configuration
 extensions, option-specific custom check functions are run on Black Flag's
-[second parsing pass][19].
+[second parsing pass][14].
 
 When a check fails, execution of its command's handler function will cease and
 [`configureErrorHandlingEpilogue`][20] will be invoked (unless you threw a
@@ -409,7 +431,9 @@ export const builder = withBuilderExtensions({
 });
 ```
 
-See the yargs documentation on [`yargs::check()`][18] for more information.
+See the yargs documentation on [`yargs::check()`][19] for more information.
+
+---
 
 ##### `subOptionOf`
 
@@ -514,7 +538,7 @@ developers can take advantage of dynamic options without sweating the
 implementation details.
 
 > Note that `subOptionOf` updates are run and applied during Black Flag's
-> [second parsing pass][19].
+> [second parsing pass][14].
 
 For example:
 
@@ -1083,13 +1107,13 @@ specification. Contributions of any kind welcome!
 [11]: #demandthisoptionxor
 [12]: #check
 [13]: #subOptionOf
-[14]: https://yargs.js.org/docs#implies
-[15]: https://github.com/yargs/yargs/issues/1322#issuecomment-1538709884
-[16]: https://yargs.js.org/docs#conflicts
-[17]: https://yargs.js.org/docs#demandOption
-[18]: https://yargs.js.org/docs#api-reference-checkfn-globaltrue
-[19]:
+[14]:
   https://github.com/Xunnamius/black-flag/tree/main?tab=readme-ov-file#motivation
+[15]: https://yargs.js.org/docs#implies
+[16]: https://github.com/yargs/yargs/issues/1322#issuecomment-1538709884
+[17]: https://yargs.js.org/docs#conflicts
+[18]: https://yargs.js.org/docs#demandOption
+[19]: https://yargs.js.org/docs#api-reference-checkfn-globaltrue
 [20]:
   https://github.com/Xunnamius/black-flag/blob/main/docs/index/type-aliases/ConfigureErrorHandlingEpilogue.md
 [21]:
