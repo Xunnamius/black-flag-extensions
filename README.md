@@ -64,9 +64,9 @@ via analysis of the returned options configuration object and the parsed command
 line arguments (i.e. `argv`).
 
 Note that options passed to configuration keys, e.g.
-`{ demandThisOptionXor: [option1, option2] }`, are represented by their exact
-names as defined (e.g. `'my-argument'`) and not their aliases (`'arg1'`) or
-camelCase forms (`'myArgument'`).
+`{ demandThisOptionXor: ['my-argument', 'my-argument-2'] }`, are represented by
+their exact names as defined (e.g. `'my-argument'`) and not their aliases
+(`'arg1'`) or camelCase forms (`'myArgument'`).
 
 ```javascript
 import { withBuilderExtensions } from '@black-flag/extensions';
