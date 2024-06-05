@@ -68,6 +68,8 @@ Note that options passed to configuration keys, e.g.
 their exact names as defined (e.g. `'my‑argument'`) and not their aliases
 (`'arg1'`) or camelCase forms (`'myArgument'`).
 
+For example:
+
 ```javascript
 import { withBuilderExtensions } from '@black-flag/extensions';
 
@@ -88,7 +90,8 @@ export default function command({ state }) {
           demandThisOptionXor: ['my-argument']
         }
       };
-    }
+    },
+    { disableAutomaticGrouping: true }
   );
 
   return {
@@ -120,14 +123,15 @@ functionality beyond that offered by vanilla yargs and Black Flag:
 | [`demandThisOption`][9]     | `P`                             |
 | [`demandThisOptionOr`][10]  | `P ∨ Q ∨ R`                     |
 | [`demandThisOptionXor`][11] | `P ⊕ Q ⊕ R`                     |
-| [`subOptionOf`][12]         | N/A                             |
+| [`check`][12]               | N/A                             |
+| [`subOptionOf`][13]         | N/A                             |
 
 ##### `requires`
 
 > `requires` is a superset of and replacement for vanilla yargs's
-> [`implies`][13]. However, `implies` is not disallowed by intellisense. If both
+> [`implies`][14]. However, `implies` is not disallowed by intellisense. If both
 > are specified, they will both be considered by Black Flag (and yargs). It is
-> recommended to avoid `implies` entirely [due to its ambiguity][14].
+> recommended to avoid `implies` entirely [due to its ambiguity][15].
 
 > `{ P: { requires: [Q, R] }}` can be read as `P ⟹ Q ∧ R` or `¬P ∨ Q ∧ R`, with
 > truth values denoting existence.
@@ -163,7 +167,7 @@ This configuration allows the following arguments: no arguments (`∅`), `‑y=.
 
 ##### `conflicts`
 
-> `conflicts` is a superset of vanilla yargs's [`conflicts`][15].
+> `conflicts` is a superset of vanilla yargs's [`conflicts`][16].
 
 > `{ P: { conflicts: [Q, R] }}` can be read as `P ⟹ ¬Q ∧ ¬R` or `¬P ∨ ¬Q ∧ ¬R`,
 > with truth values denoting existence.
@@ -199,7 +203,7 @@ This configuration allows the following arguments: no arguments (`∅`), `‑y=.
 
 ##### `demandThisOptionIf`
 
-> `demandThisOptionIf` is a superset of vanilla yargs's [`demandOption`][16].
+> `demandThisOptionIf` is a superset of vanilla yargs's [`demandOption`][17].
 
 > `{ P: { demandThisOptionIf: [Q, R] }}` can be read as `Q ∨ R ⟹ P` or
 > `P ∨ ¬Q ∧ ¬R`, with truth values denoting existence.
@@ -239,7 +243,7 @@ This configuration allows the following arguments: no arguments (`∅`), `‑x`,
 
 ##### `demandThisOption`
 
-> `demandThisOption` is an alias of vanilla yargs's [`demandOption`][16].
+> `demandThisOption` is an alias of vanilla yargs's [`demandOption`][17].
 > However, `demandOption` is not disallowed by intellisense. If both are
 > specified, the configuration defined last will win.
 
@@ -260,7 +264,7 @@ This configuration will trigger a check to ensure that `‑x` is given.
 
 ##### `demandThisOptionOr`
 
-> `demandThisOptionOr` is a superset of vanilla yargs's [`demandOption`][16].
+> `demandThisOptionOr` is a superset of vanilla yargs's [`demandOption`][17].
 
 > `{ P: { demandThisOptionOr: [Q, R] }}` can be read as `P ∨ Q ∨ R`, with truth
 > values denoting existence.
@@ -306,8 +310,8 @@ This configuration allows the following arguments: `‑x`, `‑y=one`, `‑z`,
 
 ##### `demandThisOptionXor`
 
-> `demandThisOptionXor` is a superset of vanilla yargs's [`demandOption`][16] +
-> [`conflicts`][15].
+> `demandThisOptionXor` is a superset of vanilla yargs's [`demandOption`][17] +
+> [`conflicts`][16].
 
 > `{ P: { demandThisOptionXor: [Q, R] }}` can be read as `P ⊕ Q ⊕ R`, with truth
 > values denoting existence.
@@ -342,7 +346,7 @@ For example:
 
 ```jsonc
 {
-  // ▼ Demands x or y == 'one' or z
+  // ▼ Demands x xor y == 'one' xor z
   "x": { "demandThisOptionXor": [{ "y": "one" }, "z"] },
   "y": {},
   "z": {}
@@ -353,92 +357,300 @@ This configuration allows the following arguments: `‑x`, `‑y=one`, `‑z`,
 `‑x ‑y=...`, `‑y=... ‑z`; and disallows: no arguments (`∅`), `‑y=...`,
 `‑x ‑y=one`, `‑xz`, `‑y=one ‑z`, `‑xz ‑y=...`.
 
-##### `subOptionOf`
+##### `check`
 
-<!-- TODO: fix me -->
+`check` is declarative sugar around [`yargs::check()`][18] that is applied
+specifically to the option being configured. These option-specific custom check
+functions are run on Black Flag's [second parsing pass][19].
 
-TODO (reconfigure option depending on values of other options; overlap = merged
-with latest definitions winning)
+When a check fails, execution of its command's handler function will cease and
+[`configureErrorHandlingEpilogue`][20] will be invoked (unless you threw a
+[`GracefulEarlyExitError`][21]).
 
-<!-- TODO: fix me -->
+> Note that there is no concept of a "global" check in this context. If you want
+> that, you'll have to call `blackFlag.check(...)` imperatively or implement the
+> appropriate configuration hooks (see [the bullet point on `yargs::check`][22]
+> in the Black Flag docs).
 
-TODO: happens on second parse, not first (normal "fallback" config happens on
-first)
+For example:
 
 ```javascript
-{
-  version: {
-    subOptionOf: {
-      language: [
-        {
-          when: (languageArgv) => boolean === true,
-          update:
-            ((oldConfig, fullArgv) => {
-              return newConfig;
-            }) || newConfig
-        },
-        {
-          when: (languageArgv) => anotherBoolean === true,
-          update:
-            ((oldConfig, fullArgv) => {
-              return newConfig;
-            }) || newConfig
-        }
-      ];
+export const builder = withBuilderExtensions({
+  x: {
+    number: true,
+    check: function (currentXArgValue, fullArgv) {
+      if (currentXArgValue < 0 || currentXArgValue > 10) {
+        throw new Error(
+          `"x" must be between 0 and 10 (inclusive), saw: ${currentXArgValue}`
+        );
+      }
+    }
+  },
+  y: {
+    boolean: true,
+    default: false,
+    requires: 'x',
+    check: function (currentYArgValue, fullArgv) {
+      if (currentYArgValue && fullArgv.x <= 5) {
+        throw new Error(
+          `"x" must be greater than 5 to use 'y', saw: ${fullArgv.x}`
+        );
+      }
     }
   }
-}
+});
 ```
 
-#### `requires` versus `demandThisOptionIf`
+See the yargs documentation on [`yargs::check()`][18] for more information.
 
-The utility of [`demandThisOptionIf`][8] versus [`requires`][6] (and
-[`demandThisOptionOr`][10]) becomes apparent when checking against multiple
-arguments. For example:
+##### `subOptionOf`
 
-```jsonc
-{
-  // ▼ Demands y == 'one' and z if x is given
-  "x": { "requires": [{ "y": "one" }, "z"] },
-  "y": {},
-  "z": { "requires": "y" } // ◄ Demands y if z is given
-}
+One of Black Flag's killer features is [native support for dynamic options][23].
+However, taking advantage of this feature in your commands' [`builder`][24]
+exports requires a strictly imperative approach.
+
+Take, for example, [the `init` command from @black-flag/demo][25]:
+
+```javascript
+// Taken at 06/04/2024
+// @ts-check
+
+/**
+ * @type {import('@black-flag/core').Configuration['builder']}
+ */
+export const builder = function (yargs, _, argv) {
+  yargs.parserConfiguration({ 'parse-numbers': false });
+
+  if (argv && argv.lang) {
+    // This code block implements our dynamic options (depending on --lang)
+    return argv.lang === 'node'
+      ? {
+          lang: { choices: ['node'], demandOption: true },
+          version: { choices: ['19.8', '20.9', '21.1'], default: '21.1' }
+        }
+      : {
+          lang: { choices: ['python'], demandOption: true },
+          version: {
+            choices: ['3.10', '3.11', '3.12'],
+            default: '3.12'
+          }
+        };
+  } else {
+    // This code block represents the fallback
+    return {
+      lang: { choices: ['node', 'python'], demandOption: true },
+      version: { string: true, default: 'latest' }
+    };
+  }
+};
+
+/**
+ * @type {import('@black-flag/core').Configuration<{ lang: string, version: string }>['handler']}
+ */
+export const handler = function ({ lang, version }) {
+  console.log(`> Initializing new ${lang}@${version} project...`);
+};
 ```
 
-Versus:
+Among other freebies, taking advantage of dynamic options support gifts your CLI
+with help text more gorgeous and meaningful than anything you could accomplish
+with vanilla yargs:
 
-```jsonc
-{
-  // ▼ Demands x or y == 'one' or z
-  "x": { "demandThisOptionOr": [{ "y": "one" }, "z"] },
-  "y": {},
-  // ▼ Demands z or y
-  "z": { "demandThisOptionOr": "y" }
-}
+```text
+myctl init --lang 'node' --version=21.1
+> initializing new node@21.1 project...
 ```
 
-Versus:
+```text
+myctl init --lang 'python' --version=21.1
+Usage: myctl init
 
-```jsonc
-{
-  "x": {},
-  "y": { "demandThisOptionIf": "x" }, // ◄ Demands y if x is given
-  // ▼ Demands z if x or y == one are given
-  "z": { "demandThisOptionIf": ["x", { "y": "one" }] }
-}
+Options:
+  --help     Show help text                                            [boolean]
+  --lang                                                     [choices: "python"]
+  --version                                    [choices: "3.10", "3.11", "3.12"]
+
+Invalid values:
+  Argument: version, Given: "21.1", Choices: "3.10", "3.11", "3.12"
 ```
 
-The first `requires` configuration allows the following arguments: no arguments
-(`∅`), `‑y=...`, `‑y=... ‑z`, `‑xz ‑y=one`; and disallows: `‑x`, `‑z`,
-`‑x ‑y=...`, `‑xz`, `‑xz ‑y=...`.
+```text
+myctl init --lang fake
+Usage: myctl init
 
-The second `demandThisOptionOr` configuration allows the following arguments:
-`‑y=one`, `‑z`, `‑x ‑y=...`, `‑xz`, `‑y=... ‑z`, `‑xz ‑y=...`; and disallows: no
-arguments (`∅`), `‑x`, `‑y=...`.
+Options:
+  --help     Show help text                                            [boolean]
+  --lang                                             [choices: "node", "python"]
+  --version                                                             [string]
 
-While the final `demandThisOptionIf` configuration allows the following
-arguments: no arguments (`∅`), `‑y=...`, `‑z`, `‑y=... ‑z`, `‑xz ‑y=one`; and
-disallows: `‑x`, `‑y=one`, `‑x ‑y=...`, `‑xz`, `‑xz ‑y=...`.
+Invalid values:
+  Argument: lang, Given: "fake", Choices: "node", "python"
+```
+
+```text
+myctl init --help
+Usage: myctl init
+
+Options:
+  --help     Show help text                                            [boolean]
+  --lang                                             [choices: "node", "python"]
+  --version                                                             [string]
+```
+
+Ideally, Black Flag would allow us to describe the relationship between `--lang`
+and `--version` _declaratively_, without having to drop down to imperative
+interactions with the yargs API like we did above.
+
+This is the goal of the `subOptionOf` configuration key. Using `subOptionOf`,
+developers can take advantage of dynamic options without sweating the
+implementation details.
+
+> Note that `subOptionOf` updates are run and applied during Black Flag's
+> [second parsing pass][19].
+
+For example:
+
+```javascript
+/**
+ * @type {import('@black-flag/core').Configuration['builder']}
+ */
+export const builder = withBuilderExtensions({
+  x: {
+    choices: ['a', 'b', 'c'],
+    demandThisOption: true,
+    description: 'A choice'
+  },
+  y: {
+    number: true,
+    description: 'A number'
+  },
+  z: {
+    // ▼ These configurations are applied as the baseline or "fallback" during
+    //   Black Flag's first parsing pass. The updates within subOptionOf are
+    //   evaluated and applied during Black Flag's second parsing pass.
+    boolean: true,
+    description: 'A useful context-sensitive flag',
+    subOptionOf: {
+      // ▼ Ignored if x is not given
+      x: [
+        {
+          when: (currentXArgValue, fullArgv) => currentXArgValue === 'a',
+          update:
+            // ▼ We can pass an updater function that returns an opt object.
+            //   This object will *replace* the argument's old configuration!
+            (oldXArgumentConfig, fullArgv) => {
+              return {
+                // ▼ We don't want to lose the old config, so we spread it
+                ...oldXArgumentConfig,
+                description: 'This is a switch specifically for the "a" choice'
+              };
+            }
+        },
+        {
+          when: (currentXArgValue, fullArgv) => currentXArgValue !== 'a',
+          update:
+            // ▼ Or we can just pass the replacement configuration object. Note
+            //   that, upon multiple `when` matches, the last update in the
+            //   chain will win. If you want merge behavior instead of overwrite,
+            //   spread the old config in the object you return.
+            {
+              string: true,
+              description: 'This former-flag now accepts a string instead'
+            }
+        }
+      ],
+      // ▼ Ignored if y is not given. If x and y ARE given, since this occurs
+      //   after the x config, this update will overwrite any others. Use the
+      //   functional form + object spread to preserve the old configuration
+      y: {
+        when: (currentYArgValue, fullArgv) =>
+          fullArgv.x === 'a' && currentYArgValue > 5,
+        update: (oldConfig, fullArgv) => {
+          return {
+            array: true,
+            demandThisOption: true,
+            description:
+              'This former-flag now accepts an array of two or more strings',
+            check: function (currentZArgValue, fullArgv) {
+              if (currentZArgValue.length < 2) {
+                throw new Error(
+                  `"z" must be an array of two or more strings', only saw: ${currentZArgValue.length}`
+                );
+              }
+            }
+          };
+        }
+      },
+      // ▼ Since "does-not-exist" is not an option defined anywhere, this will
+      //   always be ignored
+      'does-not-exist': []
+    }
+  }
+});
+```
+
+> Note that you cannot nest `subOptionOf` keys within each other and will
+> trigger a framework error. `subOptionOf` is only valid during Black Flag's
+> first parsing pass.
+
+Now we're ready to re-implement the `init` command from `myctl` using our new
+declarative superpowers:
+
+```javascript
+export const builder = withBuilderExtensions(function (blackFlag) {
+  blackFlag.parserConfiguration({ 'parse-numbers': false });
+
+  return {
+    lang: {
+      choices: ['node', 'python'],
+      demandOption: true,
+      subOptionOf: {
+        lang: [
+          {
+            when: (lang) => lang === 'node',
+            // ▼ Remember: updates overwrite any old config (including baseline)
+            update: {
+              choices: ['node'],
+              demandOption: true
+            }
+          },
+          {
+            when: (lang) => lang !== 'node',
+            update: {
+              choices: ['python'],
+              demandOption: true
+            }
+          }
+        ]
+      }
+    },
+    version: {
+      string: true,
+      default: 'latest',
+      subOptionOf: {
+        version: [
+          {
+            when: (_, { lang }) => lang === 'node',
+            update: {
+              choices: ['19.8', '20.9', '21.1'],
+              default: '21.1'
+            }
+          },
+          {
+            when: (_, { lang }) => lang !== 'node',
+            update: {
+              choices: ['3.10', '3.11', '3.12'],
+              default: '3.12'
+            }
+          }
+        ]
+      }
+    }
+  };
+});
+```
+
+Easy peasy!
 
 #### Support for `default` with `conflicts`/`requires` Et Al
 
@@ -664,7 +876,7 @@ export function builder(blackFlag) {
 > The yargs API can still be invoked for purposes other than defining options on
 > a command, e.g. `blackFlag.strict(false)`.
 
-To this end, the following [yargs API functions][17] are soft-disabled via
+To this end, the following [yargs API functions][26] are soft-disabled via
 intellisense:
 
 - `option`
@@ -672,27 +884,27 @@ intellisense:
 
 However, no attempt is made by BFE to restrict your use of the yargs API at
 runtime. Therefore, using yargs's API to work around these artificial
-limitations, e.g. in your command's [`builder`][18] function or via the
-[`configureExecutionPrologue`][19] hook, will result in **undefined behavior**.
+limitations, e.g. in your command's [`builder`][24] function or via the
+[`configureExecutionPrologue`][27] hook, will result in **undefined behavior**.
 
 ### Black Flag versus Black Flag Extensions
 
-The goal of [Black Flag (@black-flag/core)][20] is to be as close to a drop-in
+The goal of [Black Flag (@black-flag/core)][28] is to be as close to a drop-in
 replacement as possible for vanilla yargs, specifically for users of
-[`yargs::commandDir()`][21]. This means Black Flag must go out of its way to
+[`yargs::commandDir()`][29]. This means Black Flag must go out of its way to
 maintain 1:1 parity with the vanilla yargs API ([with a few minor
-exceptions][22]).
+exceptions][30]).
 
 As a consequence, yargs's imperative nature tends to leak through Black Flag's
 abstraction at certain points, such as with [the `blackFlag` parameter of the
-`builder` export][18]. **This is a good thing!** Since we want access to all of
+`builder` export][24]. **This is a good thing!** Since we want access to all of
 yargs's killer features without Black Flag getting in the way.
 
 However, this comes with costs. For one, the yargs's API has suffered from a bit
-of feature creep over the years. A result of this is a rigid API [with][23]
-[an][24] [abundance][25] [of][26] [footguns][27] and an [inability][28] to
-[address][29] them without introducing [massively][30] [breaking][31]
-[changes][32].
+of feature creep over the years. A result of this is a rigid API [with][31]
+[an][32] [abundance][33] [of][34] [footguns][35] and an [inability][36] to
+[address][37] them without introducing [massively][38] [breaking][39]
+[changes][40].
 
 BFE takes the "YOLO" approach by exporting several functions that build on top
 of Black Flag's feature set without worrying too much about maintaining 1:1
@@ -859,27 +1071,40 @@ specification. Contributions of any kind welcome!
 [9]: #demandthisoption
 [10]: #demandthisoptionor
 [11]: #demandthisoptionxor
-[12]: #subOptionOf
-[13]: https://yargs.js.org/docs#implies
-[14]: https://github.com/yargs/yargs/issues/1322#issuecomment-1538709884
-[15]: https://yargs.js.org/docs#conflicts
-[16]: https://yargs.js.org/docs#demandOption
-[17]: https://yargs.js.org/docs#api-reference
-[18]:
-  https://github.com/Xunnamius/black-flag/blob/main/docs/index/type-aliases/Configuration.md#builder
+[12]: #check
+[13]: #subOptionOf
+[14]: https://yargs.js.org/docs#implies
+[15]: https://github.com/yargs/yargs/issues/1322#issuecomment-1538709884
+[16]: https://yargs.js.org/docs#conflicts
+[17]: https://yargs.js.org/docs#demandOption
+[18]: https://yargs.js.org/docs#api-reference-checkfn-globaltrue
 [19]:
-  https://github.com/Xunnamius/black-flag/blob/main/docs/index/type-aliases/ConfigureExecutionPrologue.md
-[20]: https://npm.im/@black-flag/core
-[21]: https://yargs.js.org/docs#api-reference-commanddirdirectory-opts
+  https://github.com/Xunnamius/black-flag/tree/main?tab=readme-ov-file#motivation
+[20]:
+  https://github.com/Xunnamius/black-flag/blob/main/docs/index/type-aliases/ConfigureErrorHandlingEpilogue.md
+[21]:
+  https://github.com/Xunnamius/black-flag/blob/main/docs/index/classes/GracefulEarlyExitError.md
 [22]:
+  https://github.com/Xunnamius/black-flag/tree/main?tab=readme-ov-file#irrelevant-differences
+[23]:
+  https://github.com/Xunnamius/black-flag/tree/main?tab=readme-ov-file#built-in-support-for-dynamic-options-
+[24]:
+  https://github.com/Xunnamius/black-flag/blob/main/docs/index/type-aliases/Configuration.md#builder
+[25]: https://github.com/Xunnamius/black-flag-demo/blob/main/commands/init.js
+[26]: https://yargs.js.org/docs#api-reference
+[27]:
+  https://github.com/Xunnamius/black-flag/blob/main/docs/index/type-aliases/ConfigureExecutionPrologue.md
+[28]: https://npm.im/@black-flag/core
+[29]: https://yargs.js.org/docs#api-reference-commanddirdirectory-opts
+[30]:
   https://github.com/Xunnamius/black-flag?tab=readme-ov-file#differences-between-black-flag-and-yargs
-[23]: https://github.com/yargs/yargs/issues/1323
-[24]: https://github.com/yargs/yargs/issues/1442
-[25]: https://github.com/yargs/yargs/issues/2340
-[26]: https://github.com/yargs/yargs/issues/1322
-[27]: https://github.com/yargs/yargs/issues/2089
-[28]: https://github.com/yargs/yargs/issues/1975
-[29]: https://github.com/yargs/yargs-parser/issues/412
-[30]: https://github.com/yargs/yargs/issues/1680
-[31]: https://github.com/yargs/yargs/issues/1599
-[32]: https://github.com/yargs/yargs/issues/1611
+[31]: https://github.com/yargs/yargs/issues/1323
+[32]: https://github.com/yargs/yargs/issues/1442
+[33]: https://github.com/yargs/yargs/issues/2340
+[34]: https://github.com/yargs/yargs/issues/1322
+[35]: https://github.com/yargs/yargs/issues/2089
+[36]: https://github.com/yargs/yargs/issues/1975
+[37]: https://github.com/yargs/yargs-parser/issues/412
+[38]: https://github.com/yargs/yargs/issues/1680
+[39]: https://github.com/yargs/yargs/issues/1599
+[40]: https://github.com/yargs/yargs/issues/1611
