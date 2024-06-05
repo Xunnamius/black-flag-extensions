@@ -107,8 +107,9 @@ export default function command({ state }) {
 The following new configuration keys enable additional options-related units of
 functionality beyond that offered by vanilla yargs and Black Flag:
 
-> In the below definitions, `P`, `Q`, and `R` are arguments configured via
-> [`blackFlag.options({ P: { [key]: [Q, R] }})`][5].
+> In the below definitions, `P`, `Q`, and `R` are arguments (or argument-value
+> pairs) configured via [`blackFlag.options({ P: { [key]: [Q, R] }})`][5] and
+> truth values represent the existence of said arguments.
 
 | Key                         | Definition                      |
 | :-------------------------- | :------------------------------ |
