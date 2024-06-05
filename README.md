@@ -607,6 +607,7 @@ export const builder = withBuilderExtensions(function (blackFlag) {
       choices: ['node', 'python'],
       demandOption: true,
       subOptionOf: {
+        // ▼ Yep, --lang is also a suboption of --lang
         lang: [
           {
             when: (lang) => lang === 'node',
@@ -630,16 +631,17 @@ export const builder = withBuilderExtensions(function (blackFlag) {
       string: true,
       default: 'latest',
       subOptionOf: {
-        version: [
+        // ▼ --version is a suboption of --lang
+        lang: [
           {
-            when: (_, { lang }) => lang === 'node',
+            when: (lang) => lang === 'node',
             update: {
               choices: ['19.8', '20.9', '21.1'],
               default: '21.1'
             }
           },
           {
-            when: (_, { lang }) => lang !== 'node',
+            when: (lang) => lang !== 'node',
             update: {
               choices: ['3.10', '3.11', '3.12'],
               default: '3.12'
