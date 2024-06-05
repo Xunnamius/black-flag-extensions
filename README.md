@@ -178,7 +178,8 @@ This configuration allows the following arguments: no arguments (`∅`), `‑y=.
 > with truth values denoting existence.
 
 `conflicts` enables checks to ensure the specified arguments, or argument-value
-pairs, are given conditioned on the existence of another argument. For example:
+pairs, are _never_ given conditioned on the existence of another argument. For
+example:
 
 ```jsonc
 {
