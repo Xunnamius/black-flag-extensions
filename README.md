@@ -215,7 +215,8 @@ This configuration allows the following arguments: no arguments (`∅`), `‑y=.
 > `P ∨ ¬Q ∧ ¬R`, with truth values denoting existence.
 
 `demandThisOptionIf` enables checks to ensure an argument is given when at least
-one of the specified group of arguments, or argument-value pairs, is also given.
+one of the specified groups of arguments, or argument-value pairs, is also
+given.
 
 For example:
 
