@@ -591,9 +591,9 @@ export const builder = withBuilderExtensions({
 });
 ```
 
-> Note that you cannot nest `subOptionOf` keys within each other and will
+> Note that you cannot nest `subOptionOf` keys within each other. Doing so will
 > trigger a framework error. `subOptionOf` is only valid during Black Flag's
-> first parsing pass.
+> first parsing pass!
 
 Now we're ready to re-implement the `init` command from `myctl` using our new
 declarative superpowers:
