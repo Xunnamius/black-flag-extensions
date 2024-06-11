@@ -125,19 +125,28 @@ functionality beyond that offered by vanilla yargs and Black Flag:
 > of `P`, `Q`, and `R` represent the existence of each respective argument in
 > `argv`.
 
-| Key                         | Definition                      |
-| :-------------------------- | :------------------------------ |
-| [`requires`][6]             | `P ⟹ Q ∧ R` or `¬P ∨ Q ∧ R`     |
-| [`conflicts`][7]            | `P ⟹ ¬Q ∧ ¬R` or `¬P ∨ ¬Q ∧ ¬R` |
-| [`demandThisOptionIf`][8]   | `Q ∨ R ⟹ P` or `P ∨ ¬Q ∧ ¬R`    |
-| [`demandThisOption`][9]     | `P`                             |
-| [`demandThisOptionOr`][10]  | `P ∨ Q ∨ R`                     |
-| [`demandThisOptionXor`][11] | `P ⊕ Q ⊕ R`                     |
-| [`check`][12]               | N/A                             |
-| [`subOptionOf`][13]         | N/A                             |
+| Key                         | Definition                        |
+| :-------------------------- | :-------------------------------- |
+| [`requires`][6]             | `P ⟹ (Q ∧ R)` or `¬P ∨ (Q ∧ R)`   |
+| [`conflicts`][7]            | `P ⟹ ¬Q ∧ ¬R` or `¬P ∨ (¬Q ∧ ¬R)` |
+| [`demandThisOptionIf`][8]   | `(Q ∨ R) ⟹ P` or `P ∨ (¬Q ∧ ¬R)`  |
+| [`demandThisOption`][9]     | `P`                               |
+| [`demandThisOptionOr`][10]  | `P ∨ Q ∨ R`                       |
+| [`demandThisOptionXor`][11] | `P ⊕ Q ⊕ R`                       |
+| [`check`][12]               | N/A                               |
+| [`subOptionOf`][13]         | N/A                               |
 
-Keep in mind that, except where noted, the checks enabled by these keys are run
-on Black Flag's [second parsing pass][14].
+Further, the checks enabled by these configuration keys:
+
+- Are run on Black Flag's [second][14] parsing pass except where noted. This
+  allows BFE to perform checks against argument _values_ in addition to the mere
+  argument existence checks enabled by vanilla yargs.
+
+- Will ignore the existence of the
+  [`default`](https://yargs.js.org/docs/#api-reference-defaultkey-value-description)
+  key. This means you can use keys like `requires` and `conflicts` alongside
+  `default` without causing unresolvable CLI errors. This avoids a rather
+  unintuitive [yargs footgun](https://github.com/yargs/yargs/issues/1442).
 
 ---
 
@@ -146,10 +155,12 @@ on Black Flag's [second parsing pass][14].
 > `requires` is a superset of and replacement for vanilla yargs's
 > [`implies`][15]. However, `implies` is not disallowed by intellisense. If both
 > are specified, they will both be considered by Black Flag (and yargs). It is
-> recommended to avoid `implies` entirely [due to its ambiguity][16].
+> recommended to avoid `implies` entirely [due to its ambiguity][16], and its
+> inability to handle object values
+> [due to an apparent bug or type issue in yargs@17.7.2](https://github.com/Xunnamius/black-flag/issues/107).
 
-> `{ P: { requires: [Q, R] }}` can be read as `P ⟹ Q ∧ R` or `¬P ∨ Q ∧ R`, with
-> truth values denoting existence.
+> `{ P: { requires: [Q, R] }}` can be read as `P ⟹ (Q ∧ R)` or `¬P ∨ (Q ∧ R)`,
+> with truth values denoting existence.
 
 `requires` enables checks to ensure the specified arguments, or argument-value
 pairs, are given conditioned on the existence of another argument. For example:
@@ -186,8 +197,8 @@ This configuration allows the following arguments: no arguments (`∅`), `‑y=.
 
 > `conflicts` is a superset of vanilla yargs's [`conflicts`][17].
 
-> `{ P: { conflicts: [Q, R] }}` can be read as `P ⟹ ¬Q ∧ ¬R` or `¬P ∨ ¬Q ∧ ¬R`,
-> with truth values denoting existence.
+> `{ P: { conflicts: [Q, R] }}` can be read as `P ⟹ (¬Q ∧ ¬R)` or
+> `¬P ∨ (¬Q ∧ ¬R)`, with truth values denoting existence.
 
 `conflicts` enables checks to ensure the specified arguments, or argument-value
 pairs, are _never_ given conditioned on the existence of another argument. For
@@ -225,8 +236,8 @@ This configuration allows the following arguments: no arguments (`∅`), `‑y=.
 
 > `demandThisOptionIf` is a superset of vanilla yargs's [`demandOption`][18].
 
-> `{ P: { demandThisOptionIf: [Q, R] }}` can be read as `Q ∨ R ⟹ P` or
-> `P ∨ ¬Q ∧ ¬R`, with truth values denoting existence.
+> `{ P: { demandThisOptionIf: [Q, R] }}` can be read as `(Q ∨ R) ⟹ P` or
+> `P ∨ (¬Q ∧ ¬R)`, with truth values denoting existence.
 
 `demandThisOptionIf` enables checks to ensure an argument is given when at least
 one of the specified groups of arguments, or argument-value pairs, is also
