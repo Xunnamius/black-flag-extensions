@@ -125,16 +125,16 @@ functionality beyond that offered by vanilla yargs and Black Flag:
 > of `P`, `Q`, and `R` represent the existence of each respective argument in
 > `argv`.
 
-| Key                         | Definition                        |
-| :-------------------------- | :-------------------------------- |
-| [`requires`][6]             | `P ⟹ (Q ∧ R)` or `¬P ∨ (Q ∧ R)`   |
-| [`conflicts`][7]            | `P ⟹ ¬Q ∧ ¬R` or `¬P ∨ (¬Q ∧ ¬R)` |
-| [`demandThisOptionIf`][8]   | `(Q ∨ R) ⟹ P` or `P ∨ (¬Q ∧ ¬R)`  |
-| [`demandThisOption`][9]     | `P`                               |
-| [`demandThisOptionOr`][10]  | `P ∨ Q ∨ R`                       |
-| [`demandThisOptionXor`][11] | `P ⊕ Q ⊕ R`                       |
-| [`check`][12]               | N/A                               |
-| [`subOptionOf`][13]         | N/A                               |
+| Key                         | Definition                          |
+| :-------------------------- | :---------------------------------- |
+| [`requires`][6]             | `P ⟹ (Q ∧ R)` or `¬P ∨ (Q ∧ R)`     |
+| [`conflicts`][7]            | `P ⟹ (¬Q ∧ ¬R)` or `¬P ∨ (¬Q ∧ ¬R)` |
+| [`demandThisOptionIf`][8]   | `(Q ∨ R) ⟹ P` or `P ∨ (¬Q ∧ ¬R)`    |
+| [`demandThisOption`][9]     | `P`                                 |
+| [`demandThisOptionOr`][10]  | `P ∨ Q ∨ R`                         |
+| [`demandThisOptionXor`][11] | `P ⊕ Q ⊕ R`                         |
+| [`check`][12]               | N/A                                 |
+| [`subOptionOf`][13]         | N/A                                 |
 
 Further, the checks enabled by these configuration keys:
 
@@ -749,17 +749,17 @@ BFE supports automatic
 [grouping](https://yargs.js.org/docs/#api-reference-groupkeys-groupname) of
 related options for improved UX. These new groups are:
 
-- **Required Options**: options configured with
+- **"Required Options"**: options configured with
   [`demandOption`/`demandThisOption`](#demandthisoption).
-- **Required Options (at least one)**: options configured with
+- **"Required Options (at least one)"**: options configured with
   [`demandThisOptionOr`](#demandthisoptionor).
-- **Required Options (mutually exclusive)**: options configured with
+- **"Required Options (mutually exclusive)"**: options configured with
   [`demandThisOptionXor`](#demandthisoptionxor).
-- **Common Options**: options provided via `{ commonOptions: [...] }` to
+- **"Common Options"**: options provided via `{ commonOptions: [...] }` to
   `withBuilderExtensions` as its second parameter:
   `withBuilderExtensions({/*...*/}, { commonOptions });`
-- **Optional Options**: remaining options that do not fall into any of the above
-  categories.
+- **"Optional Options"**: remaining options that do not fall into any of the
+  above categories.
 
 An example from [xunnctl](https://):
 
