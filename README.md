@@ -887,28 +887,28 @@ import {
 
 import { type CustomExecutionContext } from '../configure.ts';
 
-// ▼ Let's keep our custom CLI arguments strongly 💪🏿 typed
-export type CustomCliArguments = {
-  target: DeployTarget;
-} & ( // We could make these subtypes even stronger, but returns are diminishing
-  | {
-      target: 'vercel';
-      production: boolean;
-      preview: boolean;
-    }
-  | {
-      target: 'ssh';
-      host: string;
-      toPath: string;
-    }
-);
-
 export enum DeployTarget {
   Vercel = 'vercel',
   Ssh = 'ssh'
 }
 
 export const deployTargets = Object.values(DeployTarget);
+
+// ▼ Let's keep our custom CLI arguments strongly 💪🏿 typed
+export type CustomCliArguments = {
+  target: DeployTarget;
+} & ( // We could make these subtypes even stronger, but returns are diminishing
+  | {
+      target: DeployTarget.Vercel;
+      production: boolean;
+      preview: boolean;
+    }
+  | {
+      target: DeployTarget.Ssh;
+      host: string;
+      toPath: string;
+    }
+);
 
 export default function command({ state }: CustomExecutionContext) {
   const [builder, withHandlerExtensions] =
@@ -922,28 +922,28 @@ export default function command({ state }: CustomExecutionContext) {
         alias: ['prod'],
         boolean: true,
         conflicts: { preview: true }, // ◄ Error if --preview or --preview=true
-        requires: { target: 'vercel' }, // ◄ Error if --target != vercel
+        requires: { target: DeployTarget.Vercel }, // ◄ Error if --target != vercel
         default: false, // ◄ Works in a sane way alongside conflicts/requires
         description: 'Only deploy to the remote production environment'
       },
       preview: {
         boolean: true,
         conflicts: { production: true },
-        requires: { target: 'vercel' },
+        requires: { target: DeployTarget.Vercel },
         default: true,
         description: 'Only deploy to the remote preview environment'
       },
       host: {
         string: true,
-        // ▼ Inverse of { conflicts: { target: 'vercel' }} in this example
-        requires: { target: 'ssh' }, // ◄ Error if --target != ssh
-        demandThisOptionIf: { target: 'ssh' }, // ◄ Demand --host if --target=ssh
+        // ▼ Inverse of { conflicts: { target: DeployTarget.Vercel }} in this example
+        requires: { target: DeployTarget.Ssh }, // ◄ Error if --target != ssh
+        demandThisOptionIf: { target: DeployTarget.Ssh }, // ◄ Demand --host if --target=ssh
         description: 'The host to use'
       },
       'to-path': {
         string: true,
-        requires: { target: 'ssh' },
-        demandThisOptionIf: { target: 'ssh' }, // ◄ Demand --to-path if --target=ssh
+        requires: { target: DeployTarget.Ssh },
+        demandThisOptionIf: { target: DeployTarget.Ssh }, // ◄ Demand --to-path if --target=ssh
         description: 'The deploy destination path to use'
       }
     });
@@ -960,12 +960,12 @@ export default function command({ state }: CustomExecutionContext) {
       toPath
     }) {
       switch (target) {
-        case 'vercel': {
+        case DeployTarget.Vercel: {
           // if(productionOnly) ...
           break;
         }
 
-        case 'ssh': {
+        case DeployTarget.Ssh: {
           // ...
           break;
         }
