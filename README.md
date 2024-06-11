@@ -83,7 +83,7 @@ import { withBuilderExtensions } from '@black-flag/extensions';
 
 export default function command({ state }) {
   const [builder, withHandlerExtensions] = withBuilderExtensions(
-    (blackFlag) => {
+    (blackFlag, helpOrVersionSet, argv) => {
       blackFlag.strict(false);
 
       // ▼ The "returned options configuration object"
@@ -820,6 +820,9 @@ const [builder, withHandlerExtensions] = withBuilderExtensions(
 ```
 
 ### `withUsageExtensions`
+
+> ⪢ API reference:
+> [`withUsageExtensions`](./docs/functions/withUsageExtensions.md)
 
 <!-- TODO: fix me -->
 
