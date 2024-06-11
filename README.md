@@ -824,31 +824,66 @@ const [builder, withHandlerExtensions] = withBuilderExtensions(
 > ⪢ API reference:
 > [`withUsageExtensions`](./docs/functions/withUsageExtensions.md)
 
-<!-- TODO: fix me -->
+This thin wrapper function is used for more consistent and opinionated usage
+string generation.
 
-TODO
+```javascript
+// file: xunnctl/commands/firewall/ban.js
+return {
+  // ...
+  description: 'Add an IP from the global hostile IP list',
+  usage: withUsageExtensions(
+    "$1.\n\nAdditional description text that only appears in this command's help text."
+  )
+};
+```
 
-## Examples
+```text
+$ x f b --help
+Usage: xunnctl firewall ban
 
-<!-- TODO: fix me -->
+Add an IP from the global hostile IP list.
 
-TODO
+Additional description text that only appears in this command's help text.
 
-### Using `demandThisOption`, `demandThisOptionIf`, `conflicts`, `requires`, and `default`
+Required Options:
+  --ip  An ipv4, ipv6, or supported CIDR                                                        [array]
 
-<!-- TODO: fix me -->
+Optional Options:
+  --comment  Include custom text with the ban comment where applicable                         [string]
 
-Suppose we wanted a "deploy" command with the following features:
+Common Options:
+  --help         Show help text                                                               [boolean]
+  --hush         Set output to be somewhat less verbose                      [boolean] [default: false]
+  --quiet        Set output to be dramatically less verbose (implies --hush) [boolean] [default: false]
+  --silent       No output will be generated (implies --quiet)               [boolean] [default: false]
+  --config-path  Use a custom configuration file
+                                [string] [default: "/home/freelance/.config/xunnctl-nodejs/state.json"]
+```
+
+## Example
+
+Suppose we wanted a "deploy" command with the following somewhat contrived
+features:
 
 - Ability to deploy to a Vercel production target, a Vercel preview target, or
   to a remote target via SSH.
 
 - When deploying to Vercel, allow the user to choose to deploy _only_ to preview
-  or _only_ to production, if desired.
+  (via `--preview`, short for "only preview") or _only_ to production (via
+  `--production`, short for "only production"), if desired.
 
-- When deploying to Vercel, deploy to the preview target by default.
+  - Deploy to the preview target only by default.
 
-- When deploying to a remote target via SSH,
+  - If both `--preview=false` and `--production=false`, deploy to _both_ the
+    preview and production environments.
+
+- When deploying to a remote target via SSH, require a `--host` and `--to-path`
+  be provided.
+
+  - If `--host` or `--to-path` are provided, they must be accompanied by
+    `--target=ssh` since these options don't make sense if `--target` is
+    something else.
 
 What follows is an example implementation:
 
@@ -862,10 +897,11 @@ import {
 import { type CustomExecutionContext } from '../configure.ts';
 
 // ▼ Let's keep our custom CLI arguments strongly 💪🏿 typed
-export type CustomCliArguments = { target: DeployTargets } & (
+export type CustomCliArguments = {
+  target: DeployTarget;
+} & ( // We could make these subtypes even stronger, but returns are diminishing
   | {
       target: 'vercel';
-      // We could make this subtype even stronger, but the returns are diminishing...
       production: boolean;
       preview: boolean;
     }
@@ -876,8 +912,12 @@ export type CustomCliArguments = { target: DeployTargets } & (
     }
 );
 
-export const deployTargets = ['vercel', 'ssh'] as const;
-export type DeployTargets = (typeof deployTargets)[number];
+export enum DeployTarget {
+  Vercel = 'vercel',
+  Ssh = 'ssh'
+}
+
+export const deployTargets = Object.values(DeployTarget);
 
 export default function command({ state }: CustomExecutionContext) {
   const [builder, withHandlerExtensions] =
@@ -890,14 +930,14 @@ export default function command({ state }: CustomExecutionContext) {
       production: {
         alias: ['prod'],
         boolean: true,
-        conflicts: 'preview', // ◄ Normal vanilla yargs "conflicts" semantics
+        conflicts: { preview: true }, // ◄ Error if --preview or --preview=true
         requires: { target: 'vercel' }, // ◄ Error if --target != vercel
-        default: false, // ◄ Works in a sane way alongside "conflicts"/"requires"
+        default: false, // ◄ Works in a sane way alongside conflicts/requires
         description: 'Only deploy to the remote production environment'
       },
       preview: {
         boolean: true,
-        conflicts: 'production',
+        conflicts: { production: true },
         requires: { target: 'vercel' },
         default: true,
         description: 'Only deploy to the remote preview environment'
@@ -911,7 +951,7 @@ export default function command({ state }: CustomExecutionContext) {
       },
       'to-path': {
         string: true,
-        requires: { target: 'ssh' }, // ◄ Error if --target != ssh
+        requires: { target: 'ssh' },
         demandThisOptionIf: { target: 'ssh' }, // ◄ Demand --to-path if --target=ssh
         description: 'The deploy destination path to use'
       }
@@ -943,21 +983,6 @@ export default function command({ state }: CustomExecutionContext) {
   } satisfies ChildConfiguration<CustomCliArguments, CustomExecutionContext>;
 }
 ```
-
-#### Example Outputs
-
-<!-- TODO: fix me -->
-
-TODO: takes advantage of dynamic options support! Better help text with
-requires + demandThisOptionIf
-
-<!-- TODO: fix me -->
-
-TODO: demandThisOptionIf + demandOption + others and how they overlap
-
-<!-- TODO: fix me -->
-
-TODO: python example again?
 
 ## Appendix
 
