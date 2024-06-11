@@ -451,7 +451,7 @@ exports requires a strictly imperative approach.
 Take, for example, [the `init` command from @black-flag/demo][28]:
 
 ```javascript
-// Taken at 06/04/2024
+// Taken at 06/04/2024 from @black-flag/demo "myctl" CLI
 // @ts-check
 
 /**
@@ -861,13 +861,12 @@ features:
   to a remote target via SSH.
 
 - When deploying to Vercel, allow the user to choose to deploy _only_ to preview
-  (via `--preview`, short for "only preview") or _only_ to production (via
-  `--production`, short for "only production"), if desired.
+  (`--only-preview`) or _only_ to production (`--only-production`), if desired.
 
   - Deploy to the preview target only by default.
 
-  - If both `--preview=false` and `--production=false`, deploy to _both_ the
-    preview and production environments.
+  - If both `--only-preview=false` and `--only-production=false`, deploy to
+    _both_ the preview and production environments.
 
 - When deploying to a remote target via SSH, require a `--host` and `--to-path`
   be provided.
@@ -897,7 +896,7 @@ export const deployTargets = Object.values(DeployTarget);
 // ▼ Let's keep our custom CLI arguments strongly 💪🏿 typed
 export type CustomCliArguments = {
   target: DeployTarget;
-} & ( // We could make these subtypes even stronger, but returns are diminishing
+} & ( // We could make these subtypes even stronger, but the returns are diminishing
   | {
       target: DeployTarget.Vercel;
       production: boolean;
@@ -918,17 +917,19 @@ export default function command({ state }: CustomExecutionContext) {
         choices: deployTargets,
         description: 'Select deployment target and strategy'
       },
-      production: {
-        alias: ['prod'],
+      'only-production': {
+        alias: ['production', 'prod'],
         boolean: true,
-        conflicts: { preview: true }, // ◄ Error if --preview or --preview=true
+        // ▼ Error if --only-preview or --only-preview=true
+        conflicts: { 'only-preview': true },
         requires: { target: DeployTarget.Vercel }, // ◄ Error if --target != vercel
         default: false, // ◄ Works in a sane way alongside conflicts/requires
         description: 'Only deploy to the remote production environment'
       },
-      preview: {
+      'only-preview': {
+        alias: ['preview'],
         boolean: true,
-        conflicts: { production: true },
+        conflicts: { 'only-production': true },
         requires: { target: DeployTarget.Vercel },
         default: true,
         description: 'Only deploy to the remote preview environment'
@@ -937,13 +938,15 @@ export default function command({ state }: CustomExecutionContext) {
         string: true,
         // ▼ Inverse of { conflicts: { target: DeployTarget.Vercel }} in this example
         requires: { target: DeployTarget.Ssh }, // ◄ Error if --target != ssh
-        demandThisOptionIf: { target: DeployTarget.Ssh }, // ◄ Demand --host if --target=ssh
+        // ▼ Demand --host if --target=ssh
+        demandThisOptionIf: { target: DeployTarget.Ssh },
         description: 'The host to use'
       },
       'to-path': {
         string: true,
         requires: { target: DeployTarget.Ssh },
-        demandThisOptionIf: { target: DeployTarget.Ssh }, // ◄ Demand --to-path if --target=ssh
+        // ▼ Demand --to-path if --target=ssh
+        demandThisOptionIf: { target: DeployTarget.Ssh },
         description: 'The deploy destination path to use'
       }
     });
@@ -959,6 +962,8 @@ export default function command({ state }: CustomExecutionContext) {
       host,
       toPath
     }) {
+      // if(state[...]) ...
+
       switch (target) {
         case DeployTarget.Vercel: {
           // if(productionOnly) ...
