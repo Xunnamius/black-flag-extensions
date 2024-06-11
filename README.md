@@ -139,7 +139,7 @@ functionality beyond that offered by vanilla yargs and Black Flag:
 Further, the checks enabled by these configuration keys:
 
 - Are run on Black Flag's [second][14] parsing pass except where noted. This
-  allows BFE to perform checks against argument _values_ in addition to the mere
+  allows BFE to perform checks against argument _values_ in addition to the
   argument existence checks enabled by vanilla yargs.
 
 - Will ignore the existence of the
@@ -156,8 +156,7 @@ Further, the checks enabled by these configuration keys:
 > [`implies`][15]. However, `implies` is not disallowed by intellisense. If both
 > are specified, they will both be considered by Black Flag (and yargs). It is
 > recommended to avoid `implies` entirely [due to its ambiguity][16], and its
-> inability to handle object values
-> [due to an apparent bug or type issue in yargs@17.7.2](https://github.com/Xunnamius/black-flag/issues/107).
+> [obscure handling of object values as of yargs@17.7.2](https://github.com/Xunnamius/black-flag/issues/107).
 
 > `{ P: { requires: [Q, R] }}` can be read as `P ⟹ (Q ∧ R)` or `¬P ∨ (Q ∧ R)`,
 > with truth values denoting existence.
@@ -176,7 +175,7 @@ This configuration will trigger a check to ensure that `‑y` is given whenever
 `‑x` is given.
 
 `requires` also supports checks against the parsed _values_ of arguments in
-addition to the mere argument existence checks demonstrated above. For example:
+addition to the argument existence checks demonstrated above. For example:
 
 ```jsonc
 {
@@ -215,7 +214,7 @@ This configuration will trigger a check to ensure that `‑y` is never given
 whenever `‑x` is given.
 
 `conflicts` also supports checks against the parsed _values_ of arguments in
-addition to the mere argument existence checks demonstrated above. For example:
+addition to the argument existence checks demonstrated above. For example:
 
 ```jsonc
 {
@@ -257,8 +256,8 @@ This configuration allows the following arguments: no arguments (`∅`), `‑y`,
 `‑z`, `‑yz`, `‑xyz`; and disallows: `‑x`, `‑xy`, `‑xz`.
 
 `demandThisOptionIf` also supports checks against the parsed _values_ of
-arguments in addition to the mere argument existence checks demonstrated above.
-For example:
+arguments in addition to the argument existence checks demonstrated above. For
+example:
 
 ```jsonc
 {
@@ -328,8 +327,8 @@ not required (redundant groups are discarded). The previous example demonstrates
 proper mirroring.
 
 `demandThisOptionOr` also supports checks against the parsed _values_ of
-arguments in addition to the mere argument existence checks demonstrated above.
-For example:
+arguments in addition to the argument existence checks demonstrated above. For
+example:
 
 ```jsonc
 {
@@ -379,8 +378,8 @@ is not required (redundant groups are discarded). The previous example
 demonstrates proper mirroring.
 
 `demandThisOptionXor` also supports checks against the parsed _values_ of
-arguments in addition to the mere argument existence checks demonstrated above.
-For example:
+arguments in addition to the argument existence checks demonstrated above. For
+example:
 
 ```jsonc
 {
@@ -604,7 +603,7 @@ export const builder = withBuilderExtensions({
       ],
       // ▼ Ignored if y is not given. If x and y ARE given, since this occurs
       //   after the x config, this update will overwrite any others. Use the
-      //   functional form + object spread to preserve the old configuration
+      //   functional form + object spread to preserve the old configuration.
       y: {
         when: (currentYArgValue, fullArgv) =>
           fullArgv.x === 'a' && currentYArgValue > 5,
@@ -632,9 +631,9 @@ export const builder = withBuilderExtensions({
 });
 ```
 
-> Note that you cannot nest `subOptionOf` keys within each other. Doing so will
-> trigger a framework error. `subOptionOf` is only valid during Black Flag's
-> first parsing pass!
+> Note that you cannot nest `subOptionOf` keys within each other or return an
+> object containing `subOptionOf` from an `update`. Doing so will trigger a
+> framework error.
 
 Now we're ready to re-implement the `init` command from `myctl` using our new
 declarative superpowers:
@@ -645,8 +644,10 @@ export const builder = withBuilderExtensions(function (blackFlag) {
 
   return {
     lang: {
+      // ▼ These two are our fallback or "baseline" configurations for --lang
       choices: ['node', 'python'],
       demandOption: true,
+
       subOptionOf: {
         // ▼ Yep, --lang is also a suboption of --lang
         lang: [
@@ -668,9 +669,16 @@ export const builder = withBuilderExtensions(function (blackFlag) {
         ]
       }
     },
+
+    // Another benefit of subOptionOf: all configuration relevant to a specific
+    // option is co-located within that option and not spread across some
+    // function or file. We don't have to go looking for the logic that's
+    // modifying --version since it's all right here in one code block.
     version: {
+      // ▼ These two are our fallback or "baseline" configurations for --version
       string: true,
       default: 'latest',
+
       subOptionOf: {
         // ▼ --version is a suboption of --lang
         lang: [
@@ -697,18 +705,25 @@ export const builder = withBuilderExtensions(function (blackFlag) {
 
 Easy peasy!
 
-#### Support for `default` with `conflicts`/`requires` Et Al
+#### Support for `default` with `conflicts`/`requires`/etc
 
-<!-- TODO: fix me -->
+BFE will ignore the existence of the
+[`default`](https://yargs.js.org/docs/#api-reference-defaultkey-value-description)
+key when performing its checks. This means you can use keys like `requires` and
+`conflicts` alongside `default` without causing
+[impossible configurations](#impossible-configurations) that throw unresolvable
+CLI errors.
 
-TODO: footgun avoided for free
+This workaround avoids a (in my opinion) rather unintuitive
+[yargs footgun](https://github.com/yargs/yargs/issues/1442), though there are
+decent arguments in support of vanilla yargs's behavior.
 
 #### Impossible Configurations
 
 Note that **there are no sanity checks performed to prevent demands that are
-impossible to fulfil**, so care must be taken not to ask for something insane.
+unresolvable**, so care must be taken not to ask for something insane.
 
-For example, the following configurations are impossible to fulfil:
+For example, the following configurations are impossible to resolve:
 
 ```jsonc
 {
@@ -726,16 +741,83 @@ For example, the following configurations are impossible to fulfil:
 
 #### Automatic Grouping of Related Options
 
-<!-- TODO: fix me -->
+> To support this functionality, options must be described declaratively.
+> [Defining options imperatively](#differences-between-black-flag-extensions-and-yargs)
+> will break this feature.
 
-Automatic grouping of related options. To support this functionality,
-`blackFlag.options(...)` and `blackFlag.option(...)` are no longer callable from
-within commands' `builder` functions. To add options to a command, they must be
-described declaratively, i.e. via returning an options object from your
-`builder` function.
+BFE supports automatic
+[grouping](https://yargs.js.org/docs/#api-reference-groupkeys-groupname) of
+related options for improved UX. These new groups are:
+
+- **Required Options**: options configured with
+  [`demandOption`/`demandThisOption`](#demandthisoption).
+- **Required Options (at least one)**: options configured with
+  [`demandThisOptionOr`](#demandthisoptionor).
+- **Required Options (mutually exclusive)**: options configured with
+  [`demandThisOptionXor`](#demandthisoptionxor).
+- **Common Options**: options provided via `{ commonOptions: [...] }` to
+  `withBuilderExtensions` as its second parameter:
+  `withBuilderExtensions({/*...*/}, { commonOptions });`
+- **Optional Options**: remaining options that do not fall into any of the above
+  categories.
+
+An example from [xunnctl](https://):
+
+```text
+$ x f b --help
+Usage: xunnctl firewall ban
+
+Add an IP from the global hostile IP list.
+
+Required Options:
+  --ip  An ipv4, ipv6, or supported CIDR                                                        [array]
+
+Optional Options:
+  --comment  Include custom text with the ban comment where applicable                         [string]
+
+Common Options:
+  --help         Show help text                                                               [boolean]
+  --hush         Set output to be somewhat less verbose                      [boolean] [default: false]
+  --quiet        Set output to be dramatically less verbose (implies --hush) [boolean] [default: false]
+  --silent       No output will be generated (implies --quiet)               [boolean] [default: false]
+  --config-path  Use a custom configuration file
+                                [string] [default: "/home/freelance/.config/xunnctl-nodejs/state.json"]
+```
+
+```text
+$ x d z u --help
+Usage: xunnctl dns zone update
+
+Reinitialize a DNS zones.
+
+Required Options (at least one):
+  --apex            Zero or more zone apex domains                                              [array]
+  --apex-all-known  Include all known zone apex domains                                       [boolean]
+
+Optional Options:
+  --force        Disable protections                                                          [boolean]
+  --purge-first  Delete pertinent records on the zone before recreating them                  [boolean]
+
+Common Options:
+  --help         Show help text                                                               [boolean]
+  --hush         Set output to be somewhat less verbose                      [boolean] [default: false]
+  --quiet        Set output to be dramatically less verbose (implies --hush) [boolean] [default: false]
+  --silent       No output will be generated (implies --quiet)               [boolean] [default: false]
+  --config-path  Use a custom configuration file
+                                [string] [default: "/home/freelance/.config/xunnctl-nodejs/state.json"]
+```
 
 This feature can be disabled by passing `{ disableAutomaticGrouping: true }` to
-`withBuilderExtensions`.
+`withBuilderExtensions` as its second parameter:
+
+```typescript
+const [builder, withHandlerExtensions] = withBuilderExtensions(
+  {
+    // ...
+  },
+  { disableAutomaticGrouping: true }
+);
+```
 
 ### `withUsageExtensions`
 
@@ -904,8 +986,19 @@ export function builder(blackFlag) {
 -   .default('f', '/etc/passwd')
 -   .describe('f', 'x marks the spot')
 -   .string('f');
-+
-+ // INSTEAD, use Black Flag's declarative API to define options 🙂
+-
+- // DO NOT use yargs's imperative API to define options! This *BREAKS* BFE!
+- blackFlag.options({
+-   f: {
+-     alias: 'file',
+-     demandOption: true,
+-     default: '/etc/passwd',
+-     describe: 'x marks the spot',
+-     type: 'string'
+-   }
+- });
+-
++ // INSTEAD, use yargs / Black Flag's declarative API to define options 🙂
 + return {
 +   f: {
 +     alias: 'file',
@@ -918,8 +1011,8 @@ export function builder(blackFlag) {
 }
 ```
 
-> The yargs API can still be invoked for purposes other than defining options on
-> a command, e.g. `blackFlag.strict(false)`.
+> The yargs API can and should still be invoked for purposes other than defining
+> options on a command, e.g. `blackFlag.strict(false)`.
 
 To this end, the following [yargs API functions][26] are soft-disabled via
 intellisense:
