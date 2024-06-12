@@ -457,14 +457,23 @@ argument-value pairs. Therefore, use [`check`][13] to guarantee any complex
 invariants, if necessary; ideally, you shouldn't be setting bad defaults via
 `implies`, but BFE won't stop you from doing so.
 
+For describing much more intricate implications between various arguments and
+their values, see [`subOptionOf`](#suboptionof).
+
 ---
 
 ##### `check`
 
 `check` is declarative sugar around [`yargs::check()`][21] that is applied
-specifically to the option being configured. As with its sibling configuration
-extensions, option-specific custom check functions are run on Black Flag's
-[second parsing pass][15].
+specifically to the option being configured.
+
+As with its sibling configuration extensions, option-specific custom check
+functions are run on Black Flag's [second parsing pass][15]; unlike its
+siblings, said check functions are always run _at the very end of the second
+parsing pass_, after all other configuration checks have passed and all updates
+have been applied (including `argv` updates from [BFE's `implies`](#implies)).
+This means `check` always sees the _final_ version of `argv`, which is the same
+version that the command's handler is passed.
 
 When a check fails, execution of its command's handler function will cease and
 [`configureErrorHandlingEpilogue`][22] will be invoked (unless you threw a
