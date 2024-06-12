@@ -456,7 +456,8 @@ handler.
 However, any per-option [`check`][13]s you've configured, which run last at the
 very end of BFE's handler extension function, _will_ see the implied
 argument-value pairs. Therefore, use [`check`][13] to guarantee any complex
-invariants, if necessary.
+invariants, if necessary; ideally, you shouldn't be setting bad defaults via
+`implies`, but BFE won't stop you from doing so.
 
 ---
 
