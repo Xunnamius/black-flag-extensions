@@ -154,7 +154,7 @@ Further, the checks enabled by these configuration keys:
 > [`implies`][18]. BFE also has [its own implication implementation][12]. Choose
 > [BFE's `implies`][12] over `requires` when you want one argument to imply the
 > value of another _without_ requiring the other argument to be explicitly given
-> in argv.
+> in `argv`.
 
 > `{ P: { requires: [Q, R] }}` can be read as `P ⟹ (Q ∧ R)` or `¬P ∨ (Q ∧ R)`,
 > with truth values denoting existence.
@@ -396,7 +396,7 @@ This configuration allows the following arguments: `‑x`, `‑y=one`, `‑z`,
 
 > BFE's `implies` is weaker form of [`requires`][6]. Choose `requires` over
 > BFE's `implies` when you want one argument to imply the value of another
-> _while_ requiring the other argument to be explicitly given in argv.
+> _while_ requiring the other argument to be explicitly given in `argv`.
 
 > BFE's `implies` replaces vanilla yargs's `implies` in a breaking way. The two
 > implementations are nothing alike. If you're looking for vanilla yargs's
@@ -417,11 +417,11 @@ example:
 ```
 
 This configuration make it so that `‑x` and `‑x ‑y=true` result in the exact
-same argv. Further, unlike `requires`, `implies` _makes no demands on argument
+same `argv`. Further, unlike `requires`, `implies` _makes no demands on argument
 existence_ and so allows the following arguments: no arguments (`∅`), `‑x`,
 `‑y=true`, `‑y=false`, `‑x ‑y=true`; and disallows: `‑x ‑y=false`.
 
-Additionally, if any of the specified arguments have their own `default`s
+Additionally, if any of the specified arguments have their own [`default`][16]s
 configured, said defaults will be overridden by the values of `implies`. For
 example:
 
@@ -446,6 +446,17 @@ and `P` is given, the only check that will be performed is on `P` and `Q`. If
   R: {}
 }
 ```
+
+This has implications beyond just `implies`. **An implied value will not
+transitively trigger _any_ other BFE configurations** (such as
+`demandThisOptionXor` or `subOptionOf`). The implied argument-value pair will
+simply be merged into `argv` as if you had done it manually in your command's
+handler.
+
+However, any per-option [`check`](#check)s you've configured, which run last at
+the very end of BFE's handler extension function, _will_ see the implied
+argument-value pairs. Therefore, use [`check`](#check) to guarantee any complex
+invariants, if necessary.
 
 ---
 
