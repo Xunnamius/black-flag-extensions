@@ -120,9 +120,8 @@ functionality beyond that offered by vanilla yargs and Black Flag:
 
 > In the below definitions, `P`, `Q`, and `R` are arguments (or argument-value
 > pairs) configured via a hypothetical call to
-> [`blackFlag.options({ P: { [key]: [Q, R] }})`][5]. Further, the truth values
-> of `P`, `Q`, and `R` represent the existence of each respective argument in
-> `argv`.
+> [`blackFlag.options({ P: { [key]: [Q, R] }})`][5]. The truth values of `P`,
+> `Q`, and `R` represent the existence of each respective argument in `argv`.
 
 | Key                         | Definition                          |
 | :-------------------------- | :---------------------------------- |
@@ -136,7 +135,7 @@ functionality beyond that offered by vanilla yargs and Black Flag:
 | [`check`][13]               | N/A                                 |
 | [`subOptionOf`][14]         | N/A                                 |
 
-Further, the checks enabled by these configuration keys:
+Note that the checks enabled by these configuration keys:
 
 - Are run on Black Flag's [second][15] parsing pass except where noted. This
   allows BFE to perform checks against argument _values_ in addition to the
