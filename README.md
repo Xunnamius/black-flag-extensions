@@ -417,9 +417,9 @@ example:
 ```
 
 This configuration make it so that `‑x` and `‑x ‑y=true` result in the exact
-same argv. Further, unlike `requires`, `implies` _makes no demands_ and so
-allows the following arguments: no arguments (`∅`), `‑x`, `‑y=true`, `‑y=false`,
-`‑x ‑y=true`; and disallows: `‑x ‑y=false`.
+same argv. Further, unlike `requires`, `implies` _makes no demands on argument
+existence_ and so allows the following arguments: no arguments (`∅`), `‑x`,
+`‑y=true`, `‑y=false`, `‑x ‑y=true`; and disallows: `‑x ‑y=false`.
 
 Additionally, if any of the specified arguments have their own `default`s
 configured, said defaults will be overridden by the values of `implies`. For
@@ -429,6 +429,21 @@ example:
 {
   "x": { "implies": { "y": true } },
   "y": { "default": false } // ◄ y will still default to true if x is given
+}
+```
+
+Note that `implies` configurations **do not cascade transitively**. This means
+if argument `P` `implies` argument `Q`, and argument `Q` `implies` argument `R`,
+and `P` is given, the only check that will be performed is on `P` and `Q`. If
+`P` must imply some value for both `Q` _and `R`_, specify this explicitly in
+`P`'s configuration. For example:
+
+```diff
+{
+- P: { "implies": { Q: true } },
++ P: { "implies": { Q: true, R: true } },
+  Q: { "implies": { R: true } },
+  R: {}
 }
 ```
 
