@@ -150,10 +150,10 @@ Further, the checks enabled by these configuration keys:
 ##### `requires`
 
 > `requires` is a superset of and replacement for vanilla yargs's
-> [`implies`][17]. However, `implies` is not disallowed by intellisense. If both
-> are specified, they will both be considered by Black Flag (and yargs). It is
-> recommended to avoid `implies` entirely [due to its ambiguity][18], and its
-> [obscure handling of object values as of yargs@17.7.2][19].
+> [`implies`][17], which is disallowed by intellisense. If both are specified,
+> they will both be considered by Black Flag (and yargs). It is recommended to
+> avoid `implies` entirely [due to its ambiguity][18], and its [obscure handling
+> of object values as of yargs@17.7.2][19].
 
 > `{ P: { requires: [Q, R] }}` can be read as `P ⟹ (Q ∧ R)` or `¬P ∨ (Q ∧ R)`,
 > with truth values denoting existence.
@@ -237,9 +237,7 @@ This configuration allows the following arguments: no arguments (`∅`), `‑y=.
 
 `demandThisOptionIf` enables checks to ensure an argument is given when at least
 one of the specified groups of arguments, or argument-value pairs, is also
-given.
-
-For example:
+given. For example:
 
 ```jsonc
 {
@@ -412,7 +410,7 @@ When a check fails, execution of its command's handler function will cease and
 For example:
 
 ```javascript
-export const builder = withBuilderExtensions({
+export const [builder, withHandlerExtensions] = withBuilderExtensions({
   x: {
     number: true,
     check: function (currentXArgValue, fullArgv) {
@@ -553,7 +551,7 @@ For example:
 /**
  * @type {import('@black-flag/core').Configuration['builder']}
  */
-export const builder = withBuilderExtensions({
+export const [builder, withHandlerExtensions] = withBuilderExtensions({
   x: {
     choices: ['a', 'b', 'c'],
     demandThisOption: true,
@@ -636,68 +634,70 @@ Now we're ready to re-implement the `init` command from `myctl` using our new
 declarative superpowers:
 
 ```javascript
-export const builder = withBuilderExtensions(function (blackFlag) {
-  blackFlag.parserConfiguration({ 'parse-numbers': false });
+export const [builder, withHandlerExtensions] = withBuilderExtensions(
+  function (blackFlag) {
+    blackFlag.parserConfiguration({ 'parse-numbers': false });
 
-  return {
-    lang: {
-      // ▼ These two are our fallback or "baseline" configurations for --lang
-      choices: ['node', 'python'],
-      demandOption: true,
+    return {
+      lang: {
+        // ▼ These two are our fallback or "baseline" configurations for --lang
+        choices: ['node', 'python'],
+        demandOption: true,
 
-      subOptionOf: {
-        // ▼ Yep, --lang is also a suboption of --lang
-        lang: [
-          {
-            when: (lang) => lang === 'node',
-            // ▼ Remember: updates overwrite any old config (including baseline)
-            update: {
-              choices: ['node'],
-              demandOption: true
+        subOptionOf: {
+          // ▼ Yep, --lang is also a suboption of --lang
+          lang: [
+            {
+              when: (lang) => lang === 'node',
+              // ▼ Remember: updates overwrite any old config (including baseline)
+              update: {
+                choices: ['node'],
+                demandOption: true
+              }
+            },
+            {
+              when: (lang) => lang !== 'node',
+              update: {
+                choices: ['python'],
+                demandOption: true
+              }
             }
-          },
-          {
-            when: (lang) => lang !== 'node',
-            update: {
-              choices: ['python'],
-              demandOption: true
+          ]
+        }
+      },
+
+      // Another benefit of subOptionOf: all configuration relevant to a specific
+      // option is co-located within that option and not spread across some
+      // function or file. We don't have to go looking for the logic that's
+      // modifying --version since it's all right here in one code block.
+      version: {
+        // ▼ These two are our fallback or "baseline" configurations for --version
+        string: true,
+        default: 'latest',
+
+        subOptionOf: {
+          // ▼ --version is a suboption of --lang
+          lang: [
+            {
+              when: (lang) => lang === 'node',
+              update: {
+                choices: ['19.8', '20.9', '21.1'],
+                default: '21.1'
+              }
+            },
+            {
+              when: (lang) => lang !== 'node',
+              update: {
+                choices: ['3.10', '3.11', '3.12'],
+                default: '3.12'
+              }
             }
-          }
-        ]
+          ]
+        }
       }
-    },
-
-    // Another benefit of subOptionOf: all configuration relevant to a specific
-    // option is co-located within that option and not spread across some
-    // function or file. We don't have to go looking for the logic that's
-    // modifying --version since it's all right here in one code block.
-    version: {
-      // ▼ These two are our fallback or "baseline" configurations for --version
-      string: true,
-      default: 'latest',
-
-      subOptionOf: {
-        // ▼ --version is a suboption of --lang
-        lang: [
-          {
-            when: (lang) => lang === 'node',
-            update: {
-              choices: ['19.8', '20.9', '21.1'],
-              default: '21.1'
-            }
-          },
-          {
-            when: (lang) => lang !== 'node',
-            update: {
-              choices: ['3.10', '3.11', '3.12'],
-              default: '3.12'
-            }
-          }
-        ]
-      }
-    }
-  };
-});
+    };
+  }
+);
 ```
 
 Easy peasy!
