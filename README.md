@@ -453,9 +453,9 @@ transitively trigger _any_ other BFE configurations** (such as
 simply be merged into `argv` as if you had done it manually in your command's
 handler.
 
-However, any per-option [`check`](#check)s you've configured, which run last at
-the very end of BFE's handler extension function, _will_ see the implied
-argument-value pairs. Therefore, use [`check`](#check) to guarantee any complex
+However, any per-option [`check`][13]s you've configured, which run last at the
+very end of BFE's handler extension function, _will_ see the implied
+argument-value pairs. Therefore, use [`check`][13] to guarantee any complex
 invariants, if necessary.
 
 ---
