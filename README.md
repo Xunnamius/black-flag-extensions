@@ -272,8 +272,7 @@ This configuration allows the following arguments: no arguments (`∅`), `‑x`,
 ##### `demandThisOption`
 
 > `demandThisOption` is an alias of vanilla yargs's [`demandOption`][20].
-> However, `demandOption` is not disallowed by intellisense. If both are
-> specified, the configuration defined last will win.
+> `demandOption` is disallowed by intellisense.
 
 > `{ P: { demandThisOption: true }}` can be read as `P`, with truth values
 > denoting existence.
