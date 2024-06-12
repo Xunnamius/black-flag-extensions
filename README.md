@@ -137,7 +137,7 @@ functionality beyond that offered by vanilla yargs and Black Flag:
 
 Note that the checks enabled by these configuration keys:
 
-- Are run on Black Flag's [second][15] parsing pass except where noted. This
+- Are run on Black Flag's [second parsing pass][15] except where noted. This
   allows BFE to perform checks against argument _values_ in addition to the
   argument existence checks enabled by vanilla yargs.
 
@@ -480,7 +480,8 @@ When a check fails, execution of its command's handler function will cease and
 [`GracefulEarlyExitError`][23]).
 
 > Note that there is no concept of a "global" check in this context. If you want
-> that, you'll have to call `blackFlag.check(...)` imperatively or implement the
+> that, you'll have to call `blackFlag.check(...)` imperatively, run your checks
+> in the command's [`builder`][26] function directly, or implement the
 > appropriate configuration hooks (see [the bullet point on `yargs::check`][24]
 > in the Black Flag docs).
 
@@ -1064,8 +1065,8 @@ Further documentation can be found under [`docs/`][x-repo-docs].
 ### Differences between Black Flag Extensions and Yargs
 
 When using BFE, command options must be configured by [returning an `opt`
-object][5] from your command's `builder` rather than imperatively invoking the
-yargs API.
+object][5] from your command's [`builder`][26] rather than imperatively invoking
+the yargs API.
 
 For example:
 
