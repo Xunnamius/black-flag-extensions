@@ -117,8 +117,22 @@ export default function command({ state }) {
 
 #### New Option Configuration Keys
 
-The following new configuration keys enable additional options-related units of
-functionality beyond that offered by vanilla yargs and Black Flag:
+This section details the new configuration keys made available by BFE, each
+implementing an options-related unit of functionality beyond that offered by
+vanilla yargs and Black Flag.
+
+Note that the checks enabled by these configuration keys:
+
+- Are run on Black Flag's [second parsing pass][15] except where noted. This
+  allows BFE to perform checks against argument _values_ in addition to the
+  argument existence checks enabled by vanilla yargs.
+
+- Will ignore the existence of the [`default`][16] key
+  ([unless it's a custom check](#check)). This means you can use keys like
+  `requires` and `conflicts` alongside `default` without causing unresolvable
+  CLI errors. This avoids a rather unintuitive [yargs footgun][17].
+
+**Propositional Keys**
 
 > In the below definitions, `P`, `Q`, and `R` are arguments (or argument-value
 > pairs) configured via a hypothetical call to
@@ -133,19 +147,14 @@ functionality beyond that offered by vanilla yargs and Black Flag:
 | [`demandThisOption`][9]     | `P`                                 |
 | [`demandThisOptionOr`][10]  | `P ∨ Q ∨ R`                         |
 | [`demandThisOptionXor`][11] | `P ⊕ Q ⊕ R`                         |
-| [`implies`][12]             | N/A                                 |
-| [`check`][13]               | N/A                                 |
-| [`subOptionOf`][14]         | N/A                                 |
 
-Note that the checks enabled by these configuration keys:
+**Relational Keys**
 
-- Are run on Black Flag's [second parsing pass][15] except where noted. This
-  allows BFE to perform checks against argument _values_ in addition to the
-  argument existence checks enabled by vanilla yargs.
-
-- Will ignore the existence of the [`default`][16] key. This means you can use
-  keys like `requires` and `conflicts` alongside `default` without causing
-  unresolvable CLI errors. This avoids a rather unintuitive [yargs footgun][17].
+| Key                 |
+| :------------------ |
+| [`implies`][12]     |
+| [`check`][13]       |
+| [`subOptionOf`][14] |
 
 ---
 
@@ -466,26 +475,25 @@ their values, see [`subOptionOf`][22].
 
 ##### `check`
 
-`check` is declarative sugar around [`yargs::check()`][23] that is applied
-specifically to the option being configured.
+`check` is the declarative option-specific version of vanilla yargs's
+[`yargs::check()`][23].
 
-As with its sibling configuration extensions, option-specific custom check
-functions are run on Black Flag's [second parsing pass][15]; unlike its
-siblings, said check functions are always run _at the very end of the second
-parsing pass_, after all other configuration checks have passed and all updates
-have been applied (including `argv` updates from [BFE's `implies`][12]). This
-means `check` always sees the _final_ version of `argv`, which is the same
-version that the command's [`handler`][21] is passed.
+This function receives the `currentArgumentValue`, which you are free to type as
+you please, and the fully parsed `argv`. If this function throws, the exception
+will bubble. If this function returns an instance of `Error`, a string, or any
+non-truthy value (including `undefined` or not returning anything), Black Flag
+will throw a `CliError` on your behalf.
+
+All `check` functions are run in definition order and always at the very end of
+the [second parsing pass][15], well after all other BFE checks have passed and
+all updates to `argv` have been applied (including from
+[`subOptionOf`](#suboptionof) and [BFE's `implies`][12]). This means `check`
+always sees the _final_ version of `argv`, which is the same version that the
+command's [`handler`][21] is passed.
 
 When a check fails, execution of its command's [`handler`][21] function will
 cease and [`configureErrorHandlingEpilogue`][24] will be invoked (unless you
 threw a [`GracefulEarlyExitError`][25]).
-
-> Note that there is no concept of a "global" check in this context. If you want
-> that, you'll have to call `blackFlag.check(...)` imperatively, run your checks
-> in the command's [`builder`][26] function directly, or implement the
-> appropriate configuration hooks (see [the bullet point on `yargs::check`][27]
-> in the Black Flag docs).
 
 For example:
 
@@ -499,6 +507,8 @@ export const [builder, withHandlerExtensions] = withBuilderExtensions({
           `"x" must be between 0 and 10 (inclusive), saw: ${currentXArgValue}`
         );
       }
+
+      return true;
     }
   },
   y: {
@@ -511,6 +521,8 @@ export const [builder, withHandlerExtensions] = withBuilderExtensions({
           `"x" must be greater than 5 to use 'y', saw: ${fullArgv.x}`
         );
       }
+
+      return true;
     }
   }
 });
@@ -614,8 +626,8 @@ Options:
   --version                                                             [string]
 ```
 
-Ideally, Black Flag would allow us to describe the relationship between `--lang`
-and its _suboption_ `--version` declaratively, without having to drop down to
+Ideally, Black Flag would allow us to describe the relationship between `‑‑lang`
+and its _suboption_ `‑‑version` declaratively, without having to drop down to
 imperative interactions with the yargs API like we did above.
 
 This is the goal of the `subOptionOf` configuration key. Using `subOptionOf`,
@@ -689,11 +701,10 @@ export const [builder, withHandlerExtensions] = withBuilderExtensions({
             description:
               'This former-flag now accepts an array of two or more strings',
             check: function (currentZArgValue, fullArgv) {
-              if (currentZArgValue.length < 2) {
-                throw new Error(
-                  `"z" must be an array of two or more strings', only saw: ${currentZArgValue.length}`
-                );
-              }
+              return (
+                currentZArgValue.length >= 2 ||
+                `"z" must be an array of two or more strings', only saw: ${currentZArgValue.length}`
+              );
             }
           };
         }
@@ -945,20 +956,20 @@ feature set:
   to a remote target via SSH.
 
 - When deploying to Vercel, allow the user to choose to deploy _only_ to preview
-  (`--only-preview`) or _only_ to production (`--only-production`), if desired.
+  (`‑‑only-preview`) or _only_ to production (`‑‑only-production`), if desired.
 
   - Deploy to the preview target only by default.
 
-  - If both `--only-preview=false` and `--only-production=false`, deploy to
+  - If both `‑‑only-preview=false` and `‑‑only-production=false`, deploy to
     _both_ the preview and production environments.
 
-  - If both `--only-preview=true` and `--only-production=true`, throw an error.
+  - If both `‑‑only-preview=true` and `‑‑only-production=true`, throw an error.
 
-- When deploying to a remote target via SSH, require both a `--host` and
-  `--to-path` be provided.
+- When deploying to a remote target via SSH, require both a `‑‑host` and
+  `‑‑to-path` be provided.
 
-  - If `--host` or `--to-path` are provided, they must be accompanied by
-    `--target=ssh` since these options don't make sense if `--target` is
+  - If `‑‑host` or `‑‑to-path` are provided, they must be accompanied by
+    `‑‑target=ssh` since these options don't make sense if `‑‑target` is
     something else.
 
 What follows is an example implementation:
@@ -1075,21 +1086,20 @@ feature set:
   to a remote target via SSH.
 
 - When deploying to Vercel, allow the user to choose to deploy to preview
-  (`--preview`), or to production (`--production`), or both.
+  (`‑‑preview`), or to production (`‑‑production`), or both.
 
   - Deploy to the preview target by default.
 
-  - If both `--preview=false` and `--production=false`, fallback to default
-    behavior.
+  - If both `‑‑preview=false` and `‑‑production=false`, throw an error.
 
-  - If both `--preview=true` and `--production=true`, deploy to both the preview
+  - If both `‑‑preview=true` and `‑‑production=true`, deploy to both the preview
     and production environments.
 
-- When deploying to a remote target via SSH, require a `--host` and `--to-path`
+- When deploying to a remote target via SSH, require a `‑‑host` and `‑‑to-path`
   be provided.
 
-  - If `--host` or `--to-path` are provided, they must be accompanied by
-    `--target=ssh` since these options don't make sense if `--target` is
+  - If `‑‑host` or `‑‑to-path` are provided, they must be accompanied by
+    `‑‑target=ssh` since these options don't make sense if `‑‑target` is
     something else.
 
 - Output more useful and extremely specific help text depending on the
@@ -1099,6 +1109,7 @@ What follows is an example implementation:
 
 ```typescript
 import { type ChildConfiguration } from '@black-flag/core';
+
 import {
   withBuilderExtensions,
   withUsageExtensions
@@ -1172,8 +1183,16 @@ export default function command({ state }: CustomExecutionContext) {
     preview: {
       boolean: true,
       description: 'Deploy to the remote preview environment',
-      default: true,
       requires: { target: DeployTarget.Vercel },
+      default: true,
+      check: function (preview, argv) {
+        return (
+          argv.target !== DeployTarget.Vercel ||
+          preview ||
+          argv.production ||
+          'must choose either --preview or --production deployment environment'
+        );
+      },
       subOptionOf: {
         target: {
           when: (target: DeployTarget) => target !== DeployTarget.Vercel,
