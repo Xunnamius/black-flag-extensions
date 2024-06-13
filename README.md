@@ -1077,10 +1077,10 @@ feature set:
 - When deploying to Vercel, allow the user to choose to deploy to preview
   (`--preview`), or to production (`--production`), or both.
 
-  - Deploy to the preview target only by default.
+  - Deploy to the preview target by default.
 
-  - If both `--preview=false` and `--production=false`, deploy to both the
-    preview and production environments.
+  - If both `--preview=false` and `--production=false`, fallback to default
+    behavior.
 
   - If both `--preview=true` and `--production=true`, deploy to both the preview
     and production environments.
