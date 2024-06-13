@@ -1127,7 +1127,7 @@ export type CustomCliArguments = { target: DeployTarget } & (
 );
 
 export default function command({ state }: CustomExecutionContext) {
-  const [builder, withGlobalOptionsHandling] = withStandardBuilder<
+  const [builder, withHandlerExtensions] = withBuilderExtensions<
     CustomCliArguments,
     GlobalExecutionContext
   >({
