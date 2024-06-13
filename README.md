@@ -156,6 +156,12 @@ Note that the checks enabled by these configuration keys:
 | [`check`][13]       |
 | [`subOptionOf`][14] |
 
+**Type Keys**
+
+| Key             |
+| :-------------- |
+| [`flag`](#flag) |
+
 ---
 
 ##### `requires`
@@ -792,6 +798,50 @@ export const [builder, withHandlerExtensions] = withBuilderExtensions(
 ```
 
 Easy peasy!
+
+---
+
+##### `flag`
+
+> `flag` is a superset of vanilla yargs's
+> [`boolean`](https://yargs.js.org/docs/#api-reference-booleankey). However,
+> `boolean` is _not_ disallowed by intellisense since there are still many valid
+> use cases for it.
+
+`flag` is synonymous with yargs's
+[`boolean`](https://yargs.js.org/docs/#api-reference-booleankey) in all but one
+way: a flag, when set to `false` or otherwise negated in `argv` _explicitly_
+(so: _not_ via [`default`][16] or [BFE's `implies`](#implies), for instance),
+will be deleted from the `argv` object before any of BFE's checks (like
+[`requires`](#requires)/[`conflicts`](#conflicts) or
+[`demandThisOptionIf`](#demandthisoptionif)) have a chance to notice it.
+
+Put another way: flags can only ever be `true`. A `false` flag is the same as
+the argument never having existed in `argv` at all. For example:
+
+```jsonc
+{
+  "x": { "flag": true }
+}
+```
+
+Like with a normal boolean, this configuration imposes no constraints or demands
+on the argument other than it being a boolean. That is: arguments `‑x` and
+`‑x=true` still result in an `argv` of `{ x: true }`. However, arguments
+`‑x=false` and `‑‑no‑x` will result in an `argv` of `{}`, which is the same
+outcome as giving no arguments (`∅`).
+
+Choosing `flag` over `boolean` is useful when you want to sidestep the checks
+from [BFE's propositional configuration keys](#new-option-configuration-keys)
+such as [`requires`](#requires) and [`demandThisOptionIf`](#demandthisoptionif),
+which are triggered upon the existence of the boolean arguments even when they
+are `false`. For this reason, `flag` options are usually paired with
+[`{ default: true }`][16] in their configurations.
+
+As is the case with any other argument not given, if a flag has a
+[`default`][16] defined, or is on the business end of another argument's
+[implication](#implies), the corresponding key in `argv` will still receive the
+defaulted/implied value as expected.
 
 #### Support for `default` with `conflicts`/`requires`/etc
 
