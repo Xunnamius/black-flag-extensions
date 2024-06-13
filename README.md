@@ -300,6 +300,10 @@ equivalent to `demandOption` from vanilla yargs. For example:
 
 This configuration will trigger a check to ensure that `‑x` is given.
 
+> Note that, as an alias of vanilla yargs's [`demandOption`][20], this check is
+> outsourced to yargs, which means it runs on Black Flag's _first and second
+> parsing passes_ like any other configurations key coming from vanilla yargs.
+
 ---
 
 ##### `demandThisOptionOr`
