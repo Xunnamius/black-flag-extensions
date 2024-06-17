@@ -298,12 +298,12 @@ and `P` is given, the only check that will be performed is on `P` and `Q`. If
 ```
 
 This has implications beyond just `implies`. **An implied value will not
-transitively satisfy _any_ other BFE configuration checks** (such as
-[`demandThisOptionXor`][16] or [`subOptionOf`][17]). The implied argument-value
-pair will simply be merged into `argv` as if you had done it manually in your
-command's [`handler`][20]. Instead of relying on implicit transitive
-relationships via `implies`, prefer the explicit direct relationships described
-by other [configuration keys][21].
+transitively satisfy any other BFE logic checks** (such as
+[`demandThisOptionXor`][16]) **or trigger any relational behavior** (such as
+with [`subOptionOf`][17]). The implied argument-value pair will simply be merged
+into `argv` as if you had done it manually in your command's [`handler`][20].
+Instead of relying on implicit transitive relationships via `implies`, prefer
+the explicit direct relationships described by other [configuration keys][21].
 
 However, any per-option [`check`][7]s you've configured, which are run last (at
 the very end of `withHandlerExtensions`), _will_ see the implied argument-value
