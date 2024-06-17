@@ -803,11 +803,17 @@ Easy peasy!
 
 BFE (and, consequently, BF/yargs when not generating help text) will ignore the
 existence of the [`default`][6] key until near the end of BFE's execution.
+
+> This means the optional `customBuilder` function passed to
+> `withBuilderExtensions` will _not_ see any defaulted values. However, your
+> command handlers will.
+
 Defaults are set _before_ any [`check`][7] functions are run, _before_ any
 [implications][12] are set, and _before_ the relevant command [`handler`][20] is
-invoked, but _after_ all other BFE checks have succeeded. This means you can use
-keys like [`requires`][8] and [`conflicts`][9] alongside [`default`][6] without
-causing [impossible configurations][29] that throw unresolvable CLI errors.
+invoked, but _after_ all other BFE checks have succeeded. This enables the use
+of keys like [`requires`][8] and [`conflicts`][9] alongside [`default`][6]
+without causing [impossible configurations][29] that throw unresolvable CLI
+errors.
 
 This workaround avoids a (in my opinion) rather unintuitive [yargs footgun][10],
 though there are decent arguments in support of vanilla yargs's behavior.
