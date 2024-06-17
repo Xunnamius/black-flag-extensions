@@ -145,7 +145,7 @@ Note that the checks enabled by these configuration keys:
 | :-------------------------- | :-------------------------------------------- |
 | [`requires`][8]             | `P ⟹ (Q ∧ R)` or `¬P ∨ (Q ∧ R)`               |
 | [`conflicts`][9]            | `P ⟹ (¬Q ∧ ¬R)` or `¬P ∨ (¬Q ∧ ¬R)`           |
-| [`implies`][12]             | `P ⟹ (Q ∧ R ^ (gwav(Q) ⟹ Q) ∧ (gwav(R) ⟹ R))` |
+| [`implies`][12]             | `P ⟹ (Q ∧ R ∧ (gwav(Q) ⟹ Q) ∧ (gwav(R) ⟹ R))` |
 | [`demandThisOptionIf`][13]  | `(Q ∨ R) ⟹ P` or `P ∨ (¬Q ∧ ¬R)`              |
 | [`demandThisOption`][14]    | `P`                                           |
 | [`demandThisOptionOr`][15]  | `P ∨ Q ∨ R`                                   |
