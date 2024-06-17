@@ -303,7 +303,7 @@ transitively satisfy _any_ other BFE configuration checks** (such as
 pair will simply be merged into `argv` as if you had done it manually in your
 command's [`handler`][20]. Instead of relying on implicit transitive
 relationships via `implies`, prefer the explicit direct relationships described
-by the other [configuration keys][21].
+by other [configuration keys][21].
 
 However, any per-option [`check`][7]s you've configured, which are run last (at
 the very end of `withHandlerExtensions`), _will_ see the implied argument-value
