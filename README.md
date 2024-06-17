@@ -128,23 +128,23 @@ Note that the checks enabled by these configuration keys:
   argument existence checks enabled by vanilla yargs.
 
 - Will ignore the existence of the [`default`][6] key ([unless it's a custom
-  check][7]). This means you can use keys like `requires` and `conflicts`
-  alongside `default` without causing unresolvable CLI errors. This avoids a
-  rather unintuitive [yargs footgun][8].
+  check][7]). This means you can use keys like [`requires`][8] and
+  [`conflicts`][9] alongside [`default`][6] without causing unresolvable CLI
+  errors. This avoids a rather unintuitive [yargs footgun][10].
 
 **Logical Keys**
 
 > In the below definitions, `P`, `Q`, and `R` are arguments (argument-value
 > pairs) configured via a hypothetical call to
-> [`blackFlag.options({ P: { [key]: [Q, R] }})`][9]. The truth values of `P`,
+> [`blackFlag.options({ P: { [key]: [Q, R] }})`][11]. The truth values of `P`,
 > `Q`, and `R` represent the existence of each respective argument and its value
 > in the `argv` parse result. `gwav` is a predicate standing for "given with any
 > value," meaning the argument was given on the command line.
 
 | Key                         | Definition                                    |
 | :-------------------------- | :-------------------------------------------- |
-| [`requires`][10]            | `P ⟹ (Q ∧ R)` or `¬P ∨ (Q ∧ R)`               |
-| [`conflicts`][11]           | `P ⟹ (¬Q ∧ ¬R)` or `¬P ∨ (¬Q ∧ ¬R)`           |
+| [`requires`][8]             | `P ⟹ (Q ∧ R)` or `¬P ∨ (Q ∧ R)`               |
+| [`conflicts`][9]            | `P ⟹ (¬Q ∧ ¬R)` or `¬P ∨ (¬Q ∧ ¬R)`           |
 | [`implies`][12]             | `P ⟹ (Q ∧ R ^ (gwav(Q) ⟹ Q) ∧ (gwav(R) ⟹ R))` |
 | [`demandThisOptionIf`][13]  | `(Q ∨ R) ⟹ P` or `P ∨ (¬Q ∧ ¬R)`              |
 | [`demandThisOption`][14]    | `P`                                           |
@@ -244,18 +244,18 @@ This configuration allows the following arguments: no arguments (`∅`), `‑y=.
 ##### `implies`
 
 > BFE's `implies`, since it sets arguments in `argv` if they are not already
-> set, is a weaker form of [`requires`][10]. Choose `requires` over BFE's
+> set, is a weaker form of [`requires`][8]. Choose `requires` over BFE's
 > `implies` when you want one argument to imply the value of another _while_
 > requiring the other argument to be explicitly given in `argv`.
 
 > BFE's `implies` replaces vanilla yargs's `implies` in a breaking way. The two
 > implementations are nothing alike. If you're looking for vanilla yargs's
-> functionality, see [`requires`][10].
+> functionality, see [`requires`][8].
 
 `implies` will set a default value for the specified arguments conditioned on
 the existence of another argument. If any of the specified arguments are
 explicitly given, their values must match the specified argument-value pairs
-respectively (which is the behavior of [`requires`][10]). For this reason,
+respectively (which is the behavior of [`requires`][8]). For this reason,
 `implies` only accepts one or more argument-value pairs and not raw strings. For
 example:
 
@@ -801,12 +801,15 @@ Easy peasy!
 
 #### Support for `default` with `conflicts`/`requires`/etc
 
-BFE will ignore the existence of the [`default`][6] key when performing its
-checks. This means you can use keys like `requires` and `conflicts` alongside
-`default` without causing [impossible configurations][29] that throw
+BFE, and consequently Black Flag and yargs, will ignore the existence of the
+[`default`][6] key until the the very end of BFE's execution; that is: right
+before any [`check`][7] functions are run and before the relevant command's
+[`handler`][20] is invoked, but after all other checks have succeeded. This
+means you can use keys like [`requires`][8] and [`conflicts`][9] alongside
+[`default`][6] without causing [impossible configurations][29] that throw
 unresolvable CLI errors.
 
-This workaround avoids a (in my opinion) rather unintuitive [yargs footgun][8],
+This workaround avoids a (in my opinion) rather unintuitive [yargs footgun][10],
 though there are decent arguments in support of vanilla yargs's behavior.
 
 #### Impossible Configurations
@@ -1283,8 +1286,8 @@ Further documentation can be found under [`docs/`][x-repo-docs].
 ### Differences between Black Flag Extensions and Yargs
 
 When using BFE, command options must be configured by [returning an `opt`
-object][9] from your command's [`builder`][27] rather than imperatively invoking
-the yargs API.
+object][11] from your command's [`builder`][27] rather than imperatively
+invoking the yargs API.
 
 For example:
 
@@ -1360,7 +1363,7 @@ yargs's killer features without Black Flag getting in the way.
 
 However, this comes with costs. For one, the yargs's API has suffered from a bit
 of feature creep over the years. A result of this is a rigid API [with][39]
-[an][8] [abundance][40] [of][41] [footguns][42] and an [inability][43] to
+[an][10] [abundance][40] [of][41] [footguns][42] and an [inability][43] to
 [address][44] them without introducing [massively][45] [breaking][46]
 [changes][47].
 
@@ -1526,10 +1529,10 @@ specification. Contributions of any kind welcome!
   https://github.com/Xunnamius/black-flag/tree/main?tab=readme-ov-file#motivation
 [6]: https://yargs.js.org/docs#api-reference-defaultkey-value-description
 [7]: #check
-[8]: https://github.com/yargs/yargs/issues/1442
-[9]: https://yargs.js.org/docs#api-reference-optionskey-opt
-[10]: #requires
-[11]: #conflicts
+[8]: #requires
+[9]: #conflicts
+[10]: https://github.com/yargs/yargs/issues/1442
+[11]: https://yargs.js.org/docs#api-reference-optionskey-opt
 [12]: #implies
 [13]: #demandthisoptionif
 [14]: #demandthisoption
