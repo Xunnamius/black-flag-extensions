@@ -134,12 +134,12 @@ Note that the checks enabled by these configuration keys:
 
 **Logical Keys**
 
-> In the below definitions, `P`, `Q`, and `R` are arguments (argument-value
+> In the below definitions, `P`, `Q`, and `R` are arguments (or argument-value
 > pairs) configured via a hypothetical call to
 > [`blackFlag.options({ P: { [key]: [Q, R] }})`][11]. The truth values of `P`,
-> `Q`, and `R` represent the existence of each respective argument and its value
-> in the `argv` parse result. `gwav` is a predicate standing for "given with any
-> value," meaning the argument was given on the command line.
+> `Q`, and `R` represent the existence of each respective argument (and its
+> value) in the `argv` parse result. `gwav` is a predicate standing for "given
+> with any value," meaning the argument was given on the command line.
 
 | Key                         | Definition                                    |
 | :-------------------------- | :-------------------------------------------- |
