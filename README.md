@@ -739,7 +739,7 @@ export const [builder, withHandlerExtensions] = withBuilderExtensions(
       lang: {
         // ▼ These two are our fallback or "baseline" configurations for --lang
         choices: ['node', 'python'],
-        demandOption: true,
+        demandThisOption: true,
 
         subOptionOf: {
           // ▼ Yep, --lang is also a suboption of --lang
@@ -749,14 +749,14 @@ export const [builder, withHandlerExtensions] = withBuilderExtensions(
               // ▼ Remember: updates overwrite any old config (including baseline)
               update: {
                 choices: ['node'],
-                demandOption: true
+                demandThisOption: true
               }
             },
             {
               when: (lang) => lang !== 'node',
               update: {
                 choices: ['python'],
-                demandOption: true
+                demandThisOption: true
               }
             }
           ]
@@ -847,8 +847,7 @@ For example, the following configurations are impossible to resolve:
 BFE supports automatic [grouping][30] of related options for improved UX. These
 new groups are:
 
-- **"Required Options"**: options configured with
-  [`demandOption`/`demandThisOption`][14].
+- **"Required Options"**: options configured with [`demandThisOption`][14].
 - **"Required Options (at least one)"**: options configured with
   [`demandThisOptionOr`][15].
 - **"Required Options (mutually exclusive)"**: options configured with
@@ -1331,7 +1330,7 @@ export function builder(blackFlag) {
 + return {
 +   f: {
 +     alias: 'file',
-+     demandOption: true,
++     demandThisOption: true,
 +     default: '/etc/passwd',
 +     describe: 'x marks the spot',
 +     type: 'string'
