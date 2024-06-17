@@ -139,7 +139,7 @@ Note that the checks enabled by these configuration keys:
 > [`blackFlag.options({ P: { [key]: [Q, R] }})`][9]. The truth values of `P`,
 > `Q`, and `R` represent the existence of each respective argument and its value
 > in the `argv` parse result. `gwav` is a predicate standing for "given with any
-> value," meaning the argument-value pair was given on the command line.
+> value," meaning the argument was given on the command line.
 
 | Key                         | Definition                                    |
 | :-------------------------- | :-------------------------------------------- |
