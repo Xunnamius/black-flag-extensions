@@ -499,9 +499,12 @@ all updates to `argv` have been applied (including from [`subOptionOf`][22] and
 [BFE's `implies`][12]). This means `check` always sees the _final_ version of
 `argv`, which is the same version that the command's [`handler`][20] is passed.
 
+> Note that `check` functions are skipped if their corresponding argument does
+> not exist in `argv`.
+
 When a check fails, execution of its command's [`handler`][20] function will
 cease and [`configureErrorHandlingEpilogue`][25] will be invoked (unless you
-threw a [`GracefulEarlyExitError`][26]).
+threw/returned a [`GracefulEarlyExitError`][26]).
 
 For example:
 
