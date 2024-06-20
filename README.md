@@ -117,14 +117,14 @@ Also note how `withBuilderExtensions` returns a two-element array of the form:
 `[builder, withHandlerExtensions]`. `builder` should be exported as your
 command's [`builder`][5] function **without being invoked**. If you want to
 implement additional imperative logic, pass a `customBuilder` _function_ to
-`withBuilderExtensions` as demonstrated above; otherwise, you should pass your
-options configuration object as `customBuilder`.
+`withBuilderExtensions` as demonstrated above; otherwise, you should pass a
+options configuration _object_.
 
-On the other hand, `withBuilderExtensions` **should be invoked immediately**,
+On the other hand, `withHandlerExtensions` **should be invoked immediately**,
 and its return value should be exported as your command's `handler` function, as
-demonstrated above. You should pass a `customHandler` to `withBuilderExtensions`
+demonstrated above. You should pass a `customHandler` to `withHandlerExtensions`
 upon invocation, though this is not required. If you call
-`withBuilderExtensions()` without providing a `customHandler`, a placeholder
+`withHandlerExtensions()` without providing a `customHandler`, a placeholder
 function that throws `CommandNotImplementedError` will be used instead,
 indicating that the command has not yet been implemented. This mirrors [Black
 Flag's default behavior for unimplemented command handlers][6].
@@ -366,8 +366,8 @@ example:
 ```
 
 This configuration allows the following arguments: no arguments (`∅`), `‑x`,
-`‑y=...`, `‑x ‑y=...`, `‑xz`, `‑y=... ‑z`, `-xz y=...`; and disallows: `‑z`,
-`‑y=one`, `‑y=one ‑z`.
+`‑y=...`, `‑x ‑y=...`, `‑xz`, `-xz y=...`; and disallows: `‑z`, `‑y=one`,
+`‑y=... ‑z`.
 
 ---
 
