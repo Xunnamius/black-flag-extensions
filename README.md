@@ -592,7 +592,11 @@ export const builder = function (yargs, _, argv) {
   } else {
     // This code block represents the fallback
     return {
-      lang: { choices: ['node', 'python'], demandOption: true },
+      lang: {
+        choices: ['node', 'python'],
+        demandOption: true,
+        default: 'python'
+      },
       version: { string: true, default: 'latest' }
     };
   }
@@ -728,7 +732,7 @@ export const [builder, withHandlerExtensions] = withBuilderExtensions({
             check: function (currentZArgValue, fullArgv) {
               return (
                 currentZArgValue.length >= 2 ||
-                `"z" must be an array of two or more strings', only saw: ${currentZArgValue.length}`
+                `"z" must be an array of two or more strings, only saw: ${currentZArgValue.length ?? 0}`
               );
             }
           };
@@ -759,6 +763,7 @@ export const [builder, withHandlerExtensions] = withBuilderExtensions(
         // ▼ These two are our fallback or "baseline" configurations for --lang
         choices: ['node', 'python'],
         demandThisOption: true,
+        default: 'python',
 
         subOptionOf: {
           // ▼ Yep, --lang is also a suboption of --lang
@@ -826,6 +831,11 @@ existence of the [`default`][8] key until near the end of BFE's execution.
 > This means the optional `customBuilder` function passed to
 > `withBuilderExtensions` will _not_ see any defaulted values. However, your
 > command handlers will.
+
+> Note that an explicitly `undefined` default, i.e. `{ default: undefined }`,
+> will be deleted from the configuration object and completely ignored by BFE,
+> Black Flag, and yargs. This differs from yargs's default behavior, which is to
+> recognize `undefined` defaults.
 
 Defaults are set _before_ any [`check`][9] functions are run, _before_ any
 [implications][14] are set, and _before_ the relevant command [`handler`][22] is
