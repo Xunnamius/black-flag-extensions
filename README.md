@@ -1204,7 +1204,7 @@ export default function command({ state }: CustomExecutionContext) {
           update(oldOptionConfig, { target }) {
             return {
               ...oldOptionConfig,
-              choices: [target as string]
+              choices: [target]
             };
           }
         }
