@@ -1060,8 +1060,8 @@ export default function command({ state }: CustomExecutionContext) {
       'only-production': {
         alias: ['production', 'prod'],
         boolean: true,
-        // ▼ Error if --only-preview or --only-preview=true
-        conflicts: { 'only-preview': true },
+        // ▼ Error if --only-preview/--only-preview=true, otherwise set to false
+        implies: { 'only-preview': false },
         requires: { target: DeployTarget.Vercel }, // ◄ Error if --target != vercel
         default: false, // ◄ Works in a sane way alongside conflicts/requires
         description: 'Only deploy to the remote production environment'
@@ -1069,7 +1069,7 @@ export default function command({ state }: CustomExecutionContext) {
       'only-preview': {
         alias: ['preview'],
         boolean: true,
-        conflicts: { 'only-production': true },
+        implies: { 'only-production': false },
         requires: { target: DeployTarget.Vercel },
         default: true,
         description: 'Only deploy to the remote preview environment'
@@ -1106,12 +1106,19 @@ export default function command({ state }: CustomExecutionContext) {
 
       switch (target) {
         case DeployTarget.Vercel: {
-          // if(productionOnly) ...
+          if (previewOnly || (!productionOnly && !previewOnly)) {
+            // Push to preview via vercel
+          }
+
+          if (productionOnly) {
+            // Push to production via vercel
+          }
+
           break;
         }
 
         case DeployTarget.Ssh: {
-          // ...
+          // Push to host at path via ssh
           break;
         }
       }
@@ -1194,10 +1201,10 @@ export default function command({ state }: CustomExecutionContext) {
           // Since subOptionOf runs on 2nd parse, target MUST be a DeployTarget
           // by the time subOptionOf is considered. Yay!
           when: () => true,
-          update(oldOptionConfig, argv) {
+          update(oldOptionConfig, { target }) {
             return {
               ...oldOptionConfig,
-              choices: [argv.target]
+              choices: [target as string]
             };
           }
         }
@@ -1299,12 +1306,19 @@ export default function command({ state }: CustomExecutionContext) {
 
       switch (target) {
         case DeployTarget.Vercel: {
-          // if(production) ...
+          if (production) {
+            // Push to production via vercel
+          }
+
+          if (preview) {
+            // Push to preview via vercel
+          }
+
           break;
         }
 
         case DeployTarget.Ssh: {
-          // ...
+          // Push to host at path via ssh
           break;
         }
       }
