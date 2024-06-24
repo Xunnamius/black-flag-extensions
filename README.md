@@ -378,6 +378,9 @@ This configuration allows the following arguments: no arguments (`∅`), `‑x`,
 `‑y=...`, `‑x ‑y=...`, `‑xz`, `-xz y=...`; and disallows: `‑z`, `‑y=one`,
 `‑y=... ‑z`.
 
+Note that a more powerful implementation of `demandThisOptionIf` can be achieved
+via [`subOptionOf`][25].
+
 ---
 
 ##### `demandThisOption`
