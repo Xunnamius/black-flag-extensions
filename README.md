@@ -40,7 +40,8 @@ Black Flag's declarative powers.
 - [Usage](#usage)
   - [`withBuilderExtensions`](#withbuilderextensions)
   - [`withUsageExtensions`](#withusageextensions)
-- [Example](#example)
+  - [`getInvocableExtendedHandler`](#getinvocableextendedhandler)
+- [Examples](#examples)
   - [Example 1](#example-1)
   - [Example 2](#example-2)
 - [Appendix](#appendix)
@@ -998,7 +999,140 @@ Common Options:
                                 [string] [default: "/home/freelance/.config/xunnctl-nodejs/state.json"]
 ```
 
-## Example
+### `getInvocableExtendedHandler`
+
+> ⪢ API reference:
+> [`getInvocableExtendedHandler`](./docs/functions/getInvocableExtendedHandler.md)
+
+Unlike Black Flag, BFE puts strict constraints on the order in which command
+exports must be invoked and evaluated. Specifically: an extended command's
+`builder` export must be invoked twice, with the correct parameters each time,
+before that extended command's `handler` can be invoked.
+
+This can make it especially cumbersome to import an extended command from a file
+and then invoke its `handler`, which is dead simple for normal Black Flag
+commands.
+
+For example, take the following extended command:
+
+```typescript
+// file: my-cli/commands/command-A.js
+export default function command({ state }: CustomExecutionContext) {
+  const [builder, withHandlerExtensions] =
+    withBuilderExtensions<CustomCliArguments>({
+      // ...
+    });
+
+  return {
+    builder,
+    handler: withHandlerExtensions<CustomCliArguments>(
+      async function (/* ... */) {
+        // ...
+      }
+    )
+  };
+}
+```
+
+Were `command-A` a normal non-extended Black Flag command, we could import it
+into another command (`command-B`) and run it like so:
+
+```typescript
+// file: my-cli/commands/command-B.js
+export default function command(context: CustomExecutionContext) {
+  const [builder, withHandlerExtensions] =
+    withBuilderExtensions<CustomCliArguments>({
+      // ...
+    });
+
+  return {
+    builder,
+    handler: withHandlerExtensions<CustomCliArguments>(async function (argv) {
+      const { handler } = (
+        await import('./my-cli/commands/command-A.js')
+      ).default(context);
+
+      await handler({ ...argv, somethingElse: true });
+
+      // ...
+    })
+  };
+}
+```
+
+Instead, since `command-A` was created using Black Flag Extensions, we must go
+through the following rigamarole:
+
+```typescript
+// file: my-cli/commands/command-B.js
+export default function command(context: CustomExecutionContext) {
+  const [builder, withHandlerExtensions] =
+    withBuilderExtensions<CustomCliArguments>({
+      // ...
+    });
+
+  return {
+    builder,
+    handler: withHandlerExtensions<CustomCliArguments>(async function (argv) {
+      const blackFlag = {
+        /* some kind of black hole mock */
+      };
+
+      const commandBArgv: CommandBArgumentsType = {
+        ...argv,
+        somethingElse: true
+      };
+
+      const { builder, handler } =
+        // This line assumes default export is a function (it might not be!)
+        (await import('./my-cli/commands/command-A.js')).default(context);
+
+      builder(blackFlag, false, undefined);
+      builder(blackFlag, false, commandBArgv);
+
+      await handler(commandBArgv);
+
+      // ...
+    })
+  };
+}
+```
+
+Having to go through all this just to import and invoke a command within another
+gets verbose and tiresome rather quickly, especially since Black Flag already
+makes it so easy out of the box.
+
+Hence the purpose of `getInvocableExtendedHandler`. This function returns a
+version of the imported BFE command's `handler` function that is ready to invoke
+immediately.
+
+For example:
+
+```typescript
+// file: my-cli/commands/command-B.js
+export default function command(context: CustomExecutionContext) {
+  const [builder, withHandlerExtensions] =
+    withBuilderExtensions<CustomCliArguments>({
+      // ...
+    });
+
+  return {
+    builder,
+    handler: withHandlerExtensions<CustomCliArguments>(async function (argv) {
+      const handler = await getInvocableExtendedHandler(
+        import('./my-cli/commands/command-A.js'),
+        context
+      );
+
+      await handler({ ...argv, somethingElse: true });
+
+      // ...
+    })
+  };
+}
+```
+
+## Examples
 
 In this section are two example implementations of a "deploy" command.
 
