@@ -1098,12 +1098,11 @@ export default function command(context: CustomExecutionContext) {
 }
 ```
 
-Having to go through all this just to import and invoke a command within another
-gets verbose and tiresome rather quickly, especially since Black Flag already
-makes it so easy out of the box.
+Having to go through all that just to invoke one command within another rather
+quickly gets verbose and tiresome.
 
 Hence the purpose of `getInvocableExtendedHandler`. This function returns a
-version of the imported BFE command's `handler` function that is ready to invoke
+version of the extended command's `handler` function that is ready to invoke
 immediately.
 
 For example:
