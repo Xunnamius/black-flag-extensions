@@ -1034,8 +1034,8 @@ export default function command({ state }: CustomExecutionContext) {
 }
 ```
 
-Were `command-A` a normal non-extended Black Flag command, we could import it
-into another command (`command-B`) and run it like so:
+Were `command-A` a normal non-extended Black Flag command, we could simply
+import it into another command (`command-B`) and run it like so:
 
 ```typescript
 // file: my-cli/commands/command-B.js
@@ -1075,7 +1075,7 @@ export default function command(context: CustomExecutionContext) {
     builder,
     handler: withHandlerExtensions<CustomCliArguments>(async function (argv) {
       const blackFlag = {
-        /* some kind of black hole mock */
+        /* some kind of black hole mock or proxy */
       };
 
       const commandBArgv: CommandBArgumentsType = {
@@ -1083,9 +1083,9 @@ export default function command(context: CustomExecutionContext) {
         somethingElse: true
       };
 
-      const { builder, handler } =
-        // This line assumes default export is a function (it might not be!)
-        (await import('./my-cli/commands/command-A.js')).default(context);
+      const { builder, handler } = (
+        await import('./my-cli/commands/command-A.js')
+      ).default(context);
 
       builder(blackFlag, false, undefined);
       builder(blackFlag, false, commandBArgv);
@@ -1098,12 +1098,17 @@ export default function command(context: CustomExecutionContext) {
 }
 ```
 
-Having to go through all that just to invoke one command within another rather
-quickly gets verbose and tiresome.
+Having to go through all that just to invoke one command within another quickly
+becomes verbose and tiresome. To say nothing of the fact that `command-A` might
+be changed down the road to export a configuration object or something other
+than a default function.
+
+Now we've got transitive tight-couplings between commands, which makes bugs more
+likely and harder to spot.
 
 Hence the purpose of `getInvocableExtendedHandler`. This function returns a
 version of the extended command's `handler` function that is ready to invoke
-immediately.
+immediately. It can be used with both BFE and normal Black Flag command exports.
 
 For example:
 
@@ -1119,6 +1124,7 @@ export default function command(context: CustomExecutionContext) {
     builder,
     handler: withHandlerExtensions<CustomCliArguments>(async function (argv) {
       const handler = await getInvocableExtendedHandler(
+        // This accepts a function, an object, a default export, a Promise, etc
         import('./my-cli/commands/command-A.js'),
         context
       );
