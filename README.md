@@ -1180,7 +1180,7 @@ export default function command(context: CustomExecutionContext) {
     handler: withHandlerExtensions<CustomCliArguments>(async function (argv) {
       const handler = await getInvocableExtendedHandler<
         CommandACliArguments,
-        CustomExecutionContext
+        typeof context
       >(commandA, context);
 
       await handler({ ...argv, somethingElse: true });
