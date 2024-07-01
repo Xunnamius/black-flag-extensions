@@ -1060,10 +1060,7 @@ export default function command(context: CustomExecutionContext) {
   return {
     builder,
     handler: withHandlerExtensions<CustomCliArguments>(async function (argv) {
-      const { handler } = (
-        await import('./my-cli/commands/command-A.js')
-      ).default(context);
-
+      const { handler } = (await import('./command-A.js')).default(context);
       await handler({ ...argv, somethingElse: true });
 
       // ...
@@ -1101,9 +1098,9 @@ export default function command(context: CustomExecutionContext) {
         somethingElse: true
       };
 
-      const { builder, handler } = (
-        await import('./my-cli/commands/command-A.js')
-      ).default(context);
+      const { builder, handler } = (await import('./command-A.js')).default(
+        context
+      );
 
       builder(blackFlag, false, undefined);
       builder(blackFlag, false, commandAArgv);
@@ -1142,7 +1139,7 @@ export default function command(context) {
     handler: withHandlerExtensions(async function (argv) {
       const handler = await getInvocableExtendedHandler(
         // This accepts a function, an object, a default export, a Promise, etc
-        import('./my-cli/commands/command-A.js'),
+        import('./command-A.js'),
         context
       );
 
@@ -1163,7 +1160,7 @@ import { type CustomExecutionContext } from '../configure';
 import {
   default as commandA,
   type CustomCliArguments as CommandACliArguments
-} from './my-cli/commands/command-A';
+} from './command-A';
 
 export type CustomCliArguments = {
   /* ... */
