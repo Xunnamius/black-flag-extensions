@@ -1016,7 +1016,13 @@ commands.
 For example, take the following extended command:
 
 ```typescript
-// file: my-cli/commands/command-A.js
+// file: my-cli/commands/command-A.ts
+import { type CustomExecutionContext } from '../configure';
+
+export type CustomCliArguments = {
+  /* ... */
+};
+
 export default function command({ state }: CustomExecutionContext) {
   const [builder, withHandlerExtensions] =
     withBuilderExtensions<CustomCliArguments>({
@@ -1038,7 +1044,13 @@ Were `command-A` a normal non-extended Black Flag command, we could simply
 import it into another command (`command-B`) and run it like so:
 
 ```typescript
-// file: my-cli/commands/command-B.js
+// file: my-cli/commands/command-B.ts
+import { type CustomExecutionContext } from '../configure';
+
+export type CustomCliArguments = {
+  /* ... */
+};
+
 export default function command(context: CustomExecutionContext) {
   const [builder, withHandlerExtensions] =
     withBuilderExtensions<CustomCliArguments>({
@@ -1064,7 +1076,13 @@ Instead, since `command-A` was created using Black Flag Extensions, we must go
 through the following rigamarole:
 
 ```typescript
-// file: my-cli/commands/command-B.js
+// file: my-cli/commands/command-B.ts
+import { type CustomExecutionContext } from '../configure';
+
+export type CustomCliArguments = {
+  /* ... */
+};
+
 export default function command(context: CustomExecutionContext) {
   const [builder, withHandlerExtensions] =
     withBuilderExtensions<CustomCliArguments>({
@@ -1078,7 +1096,7 @@ export default function command(context: CustomExecutionContext) {
         /* some kind of black hole mock or proxy */
       };
 
-      const commandBArgv: CommandBArgumentsType = {
+      const commandAArgv = {
         ...argv,
         somethingElse: true
       };
@@ -1088,9 +1106,9 @@ export default function command(context: CustomExecutionContext) {
       ).default(context);
 
       builder(blackFlag, false, undefined);
-      builder(blackFlag, false, commandBArgv);
+      builder(blackFlag, false, commandAArgv);
 
-      await handler(commandBArgv);
+      await handler(commandAArgv);
 
       // ...
     })
@@ -1110,10 +1128,47 @@ Hence the purpose of `getInvocableExtendedHandler`. This function returns a
 version of the extended command's `handler` function that is ready to invoke
 immediately. It can be used with both BFE and normal Black Flag command exports.
 
-For example:
+For example, in JavaScript:
+
+```javascript
+// file: my-cli/commands/command-B.js
+export default function command(context) {
+  const [builder, withHandlerExtensions] = withBuilderExtensions({
+    // ...
+  });
+
+  return {
+    builder,
+    handler: withHandlerExtensions(async function (argv) {
+      const handler = await getInvocableExtendedHandler(
+        // This accepts a function, an object, a default export, a Promise, etc
+        import('./my-cli/commands/command-A.js'),
+        context
+      );
+
+      await handler({ ...argv, somethingElse: true });
+
+      // ...
+    })
+  };
+}
+```
+
+Or in TypeScript:
 
 ```typescript
-// file: my-cli/commands/command-B.js
+// file: my-cli/commands/command-B.ts
+import { type CustomExecutionContext } from '../configure';
+
+import {
+  default as commandA,
+  type CustomCliArguments as CommandACliArguments
+} from './my-cli/commands/command-A';
+
+export type CustomCliArguments = {
+  /* ... */
+};
+
 export default function command(context: CustomExecutionContext) {
   const [builder, withHandlerExtensions] =
     withBuilderExtensions<CustomCliArguments>({
@@ -1123,11 +1178,10 @@ export default function command(context: CustomExecutionContext) {
   return {
     builder,
     handler: withHandlerExtensions<CustomCliArguments>(async function (argv) {
-      const handler = await getInvocableExtendedHandler(
-        // This accepts a function, an object, a default export, a Promise, etc
-        import('./my-cli/commands/command-A.js'),
-        context
-      );
+      const handler = await getInvocableExtendedHandler<
+        CommandACliArguments,
+        CustomExecutionContext
+      >(commandA, context);
 
       await handler({ ...argv, somethingElse: true });
 
