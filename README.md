@@ -327,6 +327,12 @@ pairs. Therefore, use [`check`][9] to guarantee any complex invariants, if
 necessary; ideally, you shouldn't be setting bad defaults via `implies`, but BFE
 won't stop you from doing so.
 
+Also note that `implies` _does_ take into account the [yargs-parser
+settings][51] `camel-case-expansion`, `strip-aliased`, and `strip-dashed`; but
+_does not_ currently pay attention to `dot-notation` or
+`duplicate-arguments-array`/`flatten-duplicate-arrays`, though `implies` still
+tends to work when using the latter.
+
 For describing much more intricate implications between various arguments and
 their values, see [`subOptionOf`][19].
 
@@ -1984,3 +1990,4 @@ specification. Contributions of any kind welcome!
 [48]: https://github.com/yargs/yargs/issues/1599
 [49]: https://github.com/yargs/yargs/issues/1611
 [50]: ./docs/functions/getInvocableExtendedHandler.md
+[51]: https://github.com/yargs/yargs-parser?tab=readme-ov-file#configuration
