@@ -10,7 +10,7 @@
 
 <!-- badges-end -->
 
-# @black-flag/extensions
+# Black Flag Extensions
 
 Black Flag Extensions (BFE) is a collection of high-order functions that wrap
 Black Flag commands' exports to provide a bevy of new declarative features, some
@@ -76,7 +76,13 @@ line arguments (i.e. `argv`).
 Note in the below example how the option names passed to configuration keys,
 e.g. `{ demandThisOptionXor: ['my-argument'] }`, are represented by their exact
 names as defined (e.g. `'my‑argument'`) and not their aliases (`'arg1'`) or
-camelCase forms (`'myArgument'`):
+camelCase forms (`'myArgument'`).
+
+> `withBuilderExtensions` will throw if you attempt to add a command option with
+> a name or alias that conflicts another of that command's options.
+> `withBuilderExtensions` also takes into account the following [yargs-parser
+> settings][51] configuration settings: `camel-case-expansion`, `strip-aliased`,
+> `strip-dashed`.
 
 ```javascript
 import { withBuilderExtensions } from '@black-flag/extensions';
@@ -330,8 +336,8 @@ won't stop you from doing so.
 Also note that `implies` _does_ take into account the [yargs-parser
 settings][51] `camel-case-expansion`, `strip-aliased`, and `strip-dashed`; but
 _does not_ currently pay attention to `dot-notation` or
-`duplicate-arguments-array`/`flatten-duplicate-arrays`, though `implies` still
-tends to work when using the latter.
+`duplicate-arguments-array`/`flatten-duplicate-arrays`. `implies` still tends to
+work when using the latter.
 
 For describing much more intricate implications between various arguments and
 their values, see [`subOptionOf`][19].
