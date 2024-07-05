@@ -79,9 +79,9 @@ names as defined (e.g. `'my‑argument'`) and not their aliases (`'arg1'`) or
 camelCase forms (`'myArgument'`).
 
 > `withBuilderExtensions` will throw if you attempt to add a command option with
-> a name or alias that conflicts another of that command's options.
-> `withBuilderExtensions` also takes into account the following [yargs-parser
-> settings][51] configuration settings: `camel-case-expansion`, `strip-aliased`,
+> a name or alias that conflicts another of that command's options. This sanity
+> check takes into account the following [yargs-parser settings][51]
+> configuration settings: `camel-case-expansion`, `strip-aliased`,
 > `strip-dashed`.
 
 ```javascript
@@ -124,7 +124,7 @@ Also note how `withBuilderExtensions` returns a two-element array of the form:
 `[builder, withHandlerExtensions]`. `builder` should be exported as your
 command's [`builder`][5] function **without being invoked**. If you want to
 implement additional imperative logic, pass a `customBuilder` _function_ to
-`withBuilderExtensions` as demonstrated above; otherwise, you should pass a
+`withBuilderExtensions` as demonstrated above; otherwise, you should pass an
 options configuration _object_.
 
 On the other hand, `withHandlerExtensions` **should be invoked immediately**,
@@ -304,11 +304,16 @@ example:
 }
 ```
 
-Note that `implies` configurations **do not cascade transitively**. This means
-if argument `P` `implies` argument `Q`, and argument `Q` `implies` argument `R`,
-and `P` is given, the only check that will be performed is on `P` and `Q`. If
-`P` must imply some value for both `Q` _and `R`_, specify this explicitly in
-`P`'s configuration. For example:
+Note that attempting to imply a value for a non-existent option will throw a
+framework error.
+
+###### Handling Transitive Implications
+
+`implies` configurations **do not cascade transitively**. This means if argument
+`P` `implies` argument `Q`, and argument `Q` `implies` argument `R`, and `P` is
+given, the only check that will be performed is on `P` and `Q`. If `P` must
+imply some value for both `Q` _and `R`_, specify this explicitly in `P`'s
+configuration. For example:
 
 ```diff
 {
@@ -333,9 +338,11 @@ pairs. Therefore, use [`check`][9] to guarantee any complex invariants, if
 necessary; ideally, you shouldn't be setting bad defaults via `implies`, but BFE
 won't stop you from doing so.
 
-Also note that `implies` _does_ take into account the [yargs-parser
-settings][51] `camel-case-expansion`, `strip-aliased`, and `strip-dashed`; but
-_does not_ currently pay attention to `dot-notation` or
+###### Handling Parser Configuration
+
+`implies` _does_ take into account the [yargs-parser settings][51]
+`camel-case-expansion`, `strip-aliased`, and `strip-dashed`; but _does not_
+currently pay attention to `dot-notation` or
 `duplicate-arguments-array`/`flatten-duplicate-arrays`. `implies` still tends to
 work when using the latter.
 
