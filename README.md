@@ -119,8 +119,8 @@ expansion will result in erroneous behavior.
 In the same vein, `withBuilderExtensions` will throw if you attempt to add a
 command option with a name, alias, or camel-case expansion that conflicts with
 another of that command's options. This sanity check takes into account the
-following [yargs-parser settings][51] configuration settings:
-`camel-case-expansion`, `strip-aliased`, `strip-dashed`.
+following [yargs-parser][51] configuration settings: `camel-case-expansion`,
+`strip-aliased`, `strip-dashed`.
 
 Also note how `withBuilderExtensions` returns a two-element array of the form:
 `[builder, withHandlerExtensions]`. `builder` should be exported as your
@@ -157,8 +157,8 @@ Note that the checks enabled by these configuration keys:
 
 - Will take into account the following [yargs-parser settings][51] configuration
   settings: `camel-case-expansion`, `strip-aliased`, `strip-dashed`. Note that
-  `dot-notation` is _not_ currently recognized or considered by BFE, but may in
-  the future.
+  `dot-notation` is _not_ currently recognized or considered by BFE, but may be
+  in the future.
 
 **Logical Keys**
 
@@ -1665,7 +1665,7 @@ export default function command({ state }: CustomExecutionContext) {
 }
 ```
 
-#### Sample Outputs
+#### Sample Outputs (From Example 2)
 
 ```text
 $ x deploy
