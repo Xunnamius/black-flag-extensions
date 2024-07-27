@@ -192,10 +192,7 @@ Note that the checks enabled by these configuration keys:
 ##### `requires`
 
 > `requires` is a superset of and replacement for vanilla yargs's
-> [`implies`][21]. BFE also has [its own implication implementation][14]. Choose
-> [BFE's `implies`][14] over `requires` when you want one argument to imply the
-> value of another _without_ requiring the other argument to be explicitly given
-> in `argv`.
+> [`implies`][21]. BFE also has [its own implication implementation][14].
 
 > `{ P: { requires: [Q, R] }}` can be read as `P ⟹ (Q ∧ R)` or `¬P ∨ (Q ∧ R)`,
 > with truth values denoting existence.
@@ -228,6 +225,12 @@ addition to the argument existence checks demonstrated above. For example:
 This configuration allows the following arguments: no arguments (`∅`), `‑y=...`,
 `‑y=... ‑z`, `‑xz ‑y=one`; and disallows: `‑x`, `‑z`, `‑x ‑y=...`, `‑xz ‑y=...`,
 `‑xz`.
+
+###### `requires` versus `implies`
+
+Choose [BFE's `implies`][14] over `requires` when you want one argument to imply
+the value of another _without_ requiring the other argument to be explicitly
+given in `argv` (e.g. via the command line).
 
 ---
 
@@ -268,25 +271,29 @@ This configuration allows the following arguments: no arguments (`∅`), `‑y=.
 `‑x`, `‑z`, `‑x ‑y=...`; and disallows: `‑y=... ‑z`, `‑x ‑y=one`, `‑xz ‑y=one`,
 `‑xz`.
 
+###### `conflicts` versus `implies`
+
+Choose [BFE's `implies`][14] over `conflicts` when you want the existence of one
+argument to override the default/given value of another argument while not
+preventing the two arguments from being given simultaneously.
+
 ---
 
 ##### `implies`
-
-> BFE's `implies`, since it sets arguments in `argv` if they are not already
-> set, is a weaker form of [`requires`][10]/[`conflicts`][11]. Choose `requires`
-> over BFE's `implies` when you want one argument to imply the value of another
-> _while_ requiring the other argument to be explicitly given in `argv`.
 
 > BFE's `implies` replaces vanilla yargs's `implies` in a breaking way. The two
 > implementations are nothing alike. If you're looking for vanilla yargs's
 > functionality, see [`requires`][10].
 
 `implies` will set a default value for the specified arguments conditioned on
-the existence of another argument. Unless [`looseImplications`][20] is set to
-`true`, if any of the specified arguments are explicitly given on the command
-line, their values must match the specified argument-value pairs respectively
-(similar to [`requires`][10]/[`conflicts`][11]). For this reason, `implies` only
-accepts one or more argument-value pairs and not raw strings. For example:
+the existence of another argument. This will _override_ the default value of the
+specified arguments.
+
+Unless [`looseImplications`][20] is set to `true`, if any of the specified
+arguments are explicitly given in `argv` (e.g. via the command line), their
+values must match the specified argument-value pairs respectively (similar to
+[`requires`][10]/[`conflicts`][11]). For this reason, `implies` only accepts one
+or more argument-value pairs and not raw strings. For example:
 
 ```jsonc
 {
@@ -359,11 +366,24 @@ parser configurations, but it is recommended you turn them off instead.
 ###### `looseImplications`
 
 If [`looseImplications`][20] is set to `true`, any of the specified arguments,
-when explicitly given on the command line, will _override_ any configured
-implications instead of causing an error. When [`looseImplications`][20] is set
-to `false`, which is the default, values given on the command line must match
-the specified argument-value pairs respectively (similar to
-[`requires`][10]/[`conflicts`][11]).
+when explicitly given in `argv` (e.g. via the command line), will _override_ any
+configured implications instead of causing an error. When
+[`looseImplications`][20] is set to `false`, which is the default, values
+explicitly given in `argv` must match the specified argument-value pairs
+respectively (similar to [`requires`][10]/[`conflicts`][11]).
+
+###### `implies` versus `requires`/`conflicts`
+
+BFE's `implies`, since it sets arguments in `argv` if they are not explicitly
+given, is a weaker form of [`requires`][10]/[`conflicts`][11].
+
+Choose `requires` over BFE's `implies` when you want one argument to imply the
+value of another _while_ requiring the other argument to be explicitly given in
+`argv` (e.g. via the command line).
+
+Choose `conflicts` over BFE's `implies` when you think you want to use `implies`
+but you don't actually need to override the default value of the implied
+argument and only want the conflict semantics.
 
 ---
 
@@ -589,6 +609,46 @@ export const [builder, withHandlerExtensions] = withBuilderExtensions({
     }
   }
 });
+```
+
+You may also pass an array of check functions, each being executed after the
+other. This makes it easy to reuse checks between options. For example:
+
+> Note that providing an array with one or more _async_ check functions will
+> result in them all being awaited concurrently.
+
+```javascript
+export const [builder, withHandlerExtensions] = withBuilderExtensions({
+  x: {
+    number: true,
+    check: [checkArgBetween0And10('x'), checkArgGreaterThan5('x')]
+  },
+  y: {
+    number: true,
+    check: checkArgBetween0And10('y')
+  },
+  z: {
+    number: true,
+    check: checkArgGreaterThan5('z')
+  }
+});
+
+function checkArgBetween0And10(argName) {
+  return function (argValue, fullArgv) {
+    return (
+      (argValue >= 0 && argValue <= 10) ||
+      `"${argName}" must be between 0 and 10 (inclusive), saw: ${argValue}`
+    );
+  };
+}
+
+function checkArgGreaterThan5(argName) {
+  return function (argValue, fullArgv) {
+    return (
+      argValue > 5 || `"${argName}" must be greater than 5, saw: ${argValue}`
+    );
+  };
+}
 ```
 
 See the yargs documentation on [`yargs::check()`][26] for more information.
