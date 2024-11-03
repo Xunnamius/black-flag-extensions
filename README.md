@@ -1154,7 +1154,7 @@ existence of the [`default`][8] key until near the end of BFE's execution.
 > `withBuilderExtensions` will _not_ see any defaulted values. However, your
 > command handlers will.
 
-> \[!NOTE]
+> \[!WARNING]
 >
 > An explicitly `undefined` default, i.e. `{ default: undefined }`, will be
 > deleted from the configuration object and completely ignored by BFE, Black
