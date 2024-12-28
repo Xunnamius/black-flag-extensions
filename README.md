@@ -1,16 +1,35 @@
-<!-- badges-start -->
+<!-- symbiote-template-region-start 1 -->
+
+<p align="center" width="100%">
+  <img width="300" src="./logo.png">
+</p>
+
+<p align="center" width="100%">
+<!-- symbiote-template-region-end -->
+A collection of simple wrapper functions providing a fully-declarative API for yargs and <a href="https://github.com/Xunnamius/black-flag">Black Flag</a>
+<!-- symbiote-template-region-start 2 -->
+</p>
+
+<hr />
+
+<div align="center">
 
 [![Black Lives Matter!][x-badge-blm-image]][x-badge-blm-link]
 [![Last commit timestamp][x-badge-lastcommit-image]][x-badge-repo-link]
 [![Codecov][x-badge-codecov-image]][x-badge-codecov-link]
 [![Source license][x-badge-license-image]][x-badge-license-link]
-[![Monthly Downloads][x-badge-downloads-image]][x-badge-npm-link]
-[![NPM version][x-badge-npm-image]][x-badge-npm-link]
 [![Uses Semantic Release!][x-badge-semanticrelease-image]][x-badge-semanticrelease-link]
 
-<!-- badges-end -->
+[![NPM version][x-badge-npm-image]][x-badge-npm-link]
+[![Monthly Downloads][x-badge-downloads-image]][x-badge-npm-link]
 
-# Black Flag Extensions
+</div>
+
+<br />
+
+# @black-flag/extensions
+
+<!-- symbiote-template-region-end -->
 
 Black Flag Extensions (BFE) is a collection of high-order functions that wrap
 Black Flag commands' exports to provide a bevy of new declarative features, some
@@ -32,9 +51,14 @@ Black Flag's declarative powers.
 > See also: [why are @black-flag/extensions and @black-flag/core separate
 > packages?][2]
 
+<!-- symbiote-template-region-start 3 -->
+
+<br />
+
 ---
 
 <!-- remark-ignore-start -->
+<!-- symbiote-template-region-end -->
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
@@ -55,9 +79,16 @@ Black Flag's declarative powers.
   - [Contributors](#contributors)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<!-- symbiote-template-region-start 4 -->
 <!-- remark-ignore-end -->
 
+<br />
+
 ## Install
+
+<!-- symbiote-template-region-end -->
+
+To install:
 
 ```shell
 npm install @black-flag/extensions
@@ -1992,7 +2023,11 @@ $ x deploy --target=vercel --preview=false --production=false
 symbiote:<error> ❌ Execution failed: must choose either --preview or --production deployment environment
 ```
 
+<!-- symbiote-template-region-start 5 -->
+
 ## Appendix
+
+<!-- symbiote-template-region-end -->
 
 Further documentation can be found under [`docs/`][x-repo-docs].
 
@@ -2098,12 +2133,17 @@ parity with the vanilla yargs's API. This way, one can opt-in to a more
 opinionated but (in my opinion) cleaner, more consistent, and more intuitive
 developer experience.
 
+<!-- symbiote-template-region-start 6 -->
+
 ### Published Package Details
 
 This is a [CJS2 package][x-pkg-cjs-mojito] with statically-analyzable exports
-built by Babel for Node.js versions that are not end-of-life. For TypeScript
-users, this package supports both `"Node10"` and `"Node16"` module resolution
-strategies.
+built by Babel for use in Node.js versions that are not end-of-life. For
+TypeScript users, this package supports both `"Node10"` and `"Node16"` module
+resolution strategies.
+
+<!-- symbiote-template-region-end -->
+<!-- symbiote-template-region-start 7 -->
 
 <details><summary>Expand details</summary>
 
@@ -2119,39 +2159,52 @@ Each entry point (i.e. `ENTRY`) in [`package.json`'s
 `exports[ENTRY]`][x-repo-package-json] object includes one or more [export
 conditions][x-pkg-exports-conditions]. These entries may or may not include: an
 [`exports[ENTRY].types`][x-pkg-exports-types-key] condition pointing to a type
-declarations file for TypeScript and IDEs, an
+declaration file for TypeScript and IDEs, a
 [`exports[ENTRY].module`][x-pkg-exports-module-key] condition pointing to
-(usually ESM) source for Webpack/Rollup, an `exports[ENTRY].node` condition
-pointing to (usually CJS2) source for Node.js `require` _and `import`_, an
-`exports[ENTRY].default` condition pointing to source for browsers and other
-environments, and [other conditions][x-pkg-exports-conditions] not enumerated
-here. Check the [package.json][x-repo-package-json] file to see which export
-conditions are supported.
+(usually ESM) source for Webpack/Rollup, a `exports[ENTRY].node` and/or
+`exports[ENTRY].default` condition pointing to (usually CJS2) source for Node.js
+`require`/`import` and for browsers and other environments, and [other
+conditions][x-pkg-exports-conditions] not enumerated here. Check the
+[package.json][x-repo-package-json] file to see which export conditions are
+supported.
 
-Though [`package.json`][x-repo-package-json] includes
-[`{ "type": "commonjs" }`][x-pkg-type], note that any ESM-only entry points will
-be ES module (`.mjs`) files. Finally, [`package.json`][x-repo-package-json] also
-includes the [`sideEffects`][x-pkg-side-effects-key] key, which is `false` for
+Note that, regardless of the [`{ "type": "..." }`][x-pkg-type] specified in
+[`package.json`][x-repo-package-json], any JavaScript files written in ESM
+syntax (including distributables) will always have the `.mjs` extension. Note
+also that [`package.json`][x-repo-package-json] may include the
+[`sideEffects`][x-pkg-side-effects-key] key, which is almost always `false` for
 optimal [tree shaking][x-pkg-tree-shaking] where appropriate.
+
+<!-- symbiote-template-region-end -->
+<!-- symbiote-template-region-start 8 -->
 
 </details>
 
 ### License
 
+<!-- symbiote-template-region-end -->
+
 See [LICENSE][x-repo-license].
+
+<!-- symbiote-template-region-start 9 -->
 
 ## Contributing and Support
 
 **[New issues][x-repo-choose-new-issue] and [pull requests][x-repo-pr-compare]
 are always welcome and greatly appreciated! 🤩** Just as well, you can [star 🌟
-this project][x-badge-repo-link] to let me know you found it useful! ✊🏿 Or you
-could [buy me a beer][x-repo-sponsor] 🥺Thank you!
+this project][x-badge-repo-link] to let me know you found it useful! ✊🏿 Or [buy
+me a beer][x-repo-sponsor], I'd appreciate it. Thank you!
 
 See [CONTRIBUTING.md][x-repo-contributing] and [SUPPORT.md][x-repo-support] for
 more information.
 
+<!-- symbiote-template-region-end -->
+<!-- symbiote-template-region-start 10 -->
+
 ### Contributors
 
+<!-- symbiote-template-region-end -->
+<!-- symbiote-template-region-start root-package-only -->
 <!-- remark-ignore-start -->
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 
@@ -2193,6 +2246,12 @@ key][x-repo-all-contributors-emojis]):
 This project follows the [all-contributors][x-repo-all-contributors]
 specification. Contributions of any kind welcome!
 
+<!-- remark-ignore-start -->
+<!-- symbiote-template-region-end -->
+<!-- symbiote-template-region-start workspace-package-only -->
+<!-- (section elided by symbiote) -->
+<!-- symbiote-template-region-end -->
+
 [x-badge-blm-image]: https://xunn.at/badge-blm 'Join the movement!'
 [x-badge-blm-link]: https://xunn.at/donate-blm
 [x-badge-codecov-image]:
@@ -2224,6 +2283,8 @@ specification. Contributions of any kind welcome!
   https://dev.to/jakobjingleheimer/configuring-commonjs-es-modules-for-nodejs-12ed#publish-only-a-cjs-distribution-with-property-exports
 [x-pkg-dual-package-hazard]:
   https://nodejs.org/api/packages.html#dual-package-hazard
+[x-pkg-esm-wine]:
+  https://dev.to/jakobjingleheimer/configuring-commonjs-es-modules-for-nodejs-12ed#esm-source-and-distribution
 [x-pkg-exports-conditions]:
   https://webpack.js.org/guides/package-exports#reference-syntax
 [x-pkg-exports-module-key]:
@@ -2240,6 +2301,7 @@ specification. Contributions of any kind welcome!
 [x-repo-choose-new-issue]:
   https://github.com/xunnamius/black-flag-extensions/issues/new/choose
 [x-repo-contributing]: /CONTRIBUTING.md
+[x-repo-contributors]: /README.md#contributors
 [x-repo-docs]: docs
 [x-repo-license]: ./LICENSE
 [x-repo-package-json]: package.json
