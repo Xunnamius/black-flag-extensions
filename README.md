@@ -6,7 +6,7 @@
 
 <p align="center" width="100%">
 <!-- symbiote-template-region-end -->
-A collection of declarative-first APIs for yargs and <a href="https://github.com/Xunnamius/black-flag">Black Flag</a>
+A collection of set-theoretic declarative-first APIs for yargs and <a href="https://github.com/Xunnamius/black-flag">Black Flag</a>
 <!-- symbiote-template-region-start 2 -->
 </p>
 
@@ -145,7 +145,7 @@ export default function command({ state }) {
 ```
 
 Note how, in the previous example, the option names passed to configuration
-keys, e.g. `{ demandThisOptionXor: ['my-argument'] }`, are represented by their
+keys, e.g. `{ demandThisOptionXor: ['my-argument'] }`, are represented by their
 exact _canonical_ names as defined (e.g. `'my‑argument'`) and not their aliases
 (`'arg1'`) or camel-case expanded forms (`'myArgument'`). All BFE configuration
 keys expect canonical option names in this way; passing an alias or a camel-case
@@ -201,20 +201,20 @@ Note that the checks enabled by these configuration keys:
 >
 > In the below definitions, `P`, `Q`, and `R` are arguments (or argument-value
 > pairs) configured via a hypothetical call to
-> [`blackFlag.options({ P: { [key]: [Q, R] }})`][13]. The truth values of `P`,
+> [`blackFlag.options({ P: { [key]: [Q, R] }})`][13]. The truth values of `P`,
 > `Q`, and `R` represent the existence of each respective argument (and its
 > value) in the `argv` parse result. `gwav` is a predicate standing for "given
 > with any value," meaning the argument was given on the command line.
 
 | Key                         | Definition                                    |
 | :-------------------------- | :-------------------------------------------- |
-| [`requires`][10]            | `P ⟹ (Q ∧ R)` or `¬P ∨ (Q ∧ R)`               |
-| [`conflicts`][11]           | `P ⟹ (¬Q ∧ ¬R)` or `¬P ∨ (¬Q ∧ ¬R)`           |
-| [`implies`][14]             | `P ⟹ (Q ∧ R ∧ (gwav(Q) ⟹ Q) ∧ (gwav(R) ⟹ R))` |
-| [`demandThisOptionIf`][15]  | `(Q ∨ R) ⟹ P` or `P ∨ (¬Q ∧ ¬R)`              |
+| [`requires`][10]            | `P ⟹ (Q ∧ R)` or `¬P ∨ (Q ∧ R)`               |
+| [`conflicts`][11]           | `P ⟹ (¬Q ∧ ¬R)` or `¬P ∨ (¬Q ∧ ¬R)`           |
+| [`implies`][14]             | `P ⟹ (Q ∧ R ∧ (gwav(Q) ⟹ Q) ∧ (gwav(R) ⟹ R))` |
+| [`demandThisOptionIf`][15]  | `(Q ∨ R) ⟹ P` or `P ∨ (¬Q ∧ ¬R)`              |
 | [`demandThisOption`][16]    | `P`                                           |
-| [`demandThisOptionOr`][17]  | `P ∨ Q ∨ R`                                   |
-| [`demandThisOptionXor`][18] | `P ⊕ Q ⊕ R`                                   |
+| [`demandThisOptionOr`][17]  | `P ∨ Q ∨ R`                                   |
+| [`demandThisOptionXor`][18] | `P ⊕ Q ⊕ R`                                   |
 
 **Relational Keys**
 
@@ -235,7 +235,7 @@ Note that the checks enabled by these configuration keys:
 
 > [!NOTE]
 >
-> `{ P: { requires: [Q, R] }}` can be read as `P ⟹ (Q ∧ R)` or `¬P ∨ (Q ∧ R)`,
+> `{ P: { requires: [Q, R] }}` can be read as `P ⟹ (Q ∧ R)` or `¬P ∨ (Q ∧ R)`,
 > with truth values denoting existence.
 
 `requires` enables checks to ensure the specified arguments, or argument-value
@@ -264,7 +264,7 @@ addition to the argument existence checks demonstrated above. For example:
 ```
 
 This configuration allows the following arguments: no arguments (`∅`), `‑y=...`,
-`‑y=... ‑z`, `‑xz ‑y=one`; and disallows: `‑x`, `‑z`, `‑x ‑y=...`, `‑xz ‑y=...`,
+`‑y=... ‑z`, `‑xz ‑y=one`; and disallows: `‑x`, `‑z`, `‑x ‑y=...`, `‑xz ‑y=...`,
 `‑xz`.
 
 Note that, when performing a check using the parsed value of an argument and
@@ -287,8 +287,8 @@ given in `argv` (e.g. via the command line).
 
 > [!NOTE]
 >
-> `{ P: { conflicts: [Q, R] }}` can be read as `P ⟹ (¬Q ∧ ¬R)` or
-> `¬P ∨ (¬Q ∧ ¬R)`, with truth values denoting existence.
+> `{ P: { conflicts: [Q, R] }}` can be read as `P ⟹ (¬Q ∧ ¬R)` or
+> `¬P ∨ (¬Q ∧ ¬R)`, with truth values denoting existence.
 
 `conflicts` enables checks to ensure the specified arguments, or argument-value
 pairs, are _never_ given conditioned on the existence of another argument. For
@@ -317,7 +317,7 @@ addition to the argument existence checks demonstrated above. For example:
 ```
 
 This configuration allows the following arguments: no arguments (`∅`), `‑y=...`,
-`‑x`, `‑z`, `‑x ‑y=...`; and disallows: `‑y=... ‑z`, `‑x ‑y=one`, `‑xz ‑y=one`,
+`‑x`, `‑z`, `‑x ‑y=...`; and disallows: `‑y=... ‑z`, `‑x ‑y=one`, `‑xz ‑y=one`,
 `‑xz`.
 
 Note that, when performing a check using the parsed value of an argument and
@@ -556,8 +556,8 @@ behavior for a specific option, set `vacuousImplications` to `true` (it is
 
 > [!NOTE]
 >
-> `{ P: { demandThisOptionIf: [Q, R] }}` can be read as `(Q ∨ R) ⟹ P` or
-> `P ∨ (¬Q ∧ ¬R)`, with truth values denoting existence.
+> `{ P: { demandThisOptionIf: [Q, R] }}` can be read as `(Q ∨ R) ⟹ P` or
+> `P ∨ (¬Q ∧ ¬R)`, with truth values denoting existence.
 
 `demandThisOptionIf` enables checks to ensure an argument is given when at least
 one of the specified groups of arguments, or argument-value pairs, is also
@@ -588,8 +588,8 @@ example:
 ```
 
 This configuration allows the following arguments: no arguments (`∅`), `‑x`,
-`‑y=...`, `‑x ‑y=...`, `‑xz`, `‑xz y=...`; and disallows: `‑z`, `‑y=one`,
-`‑y=... ‑z`.
+`‑y=...`, `‑x ‑y=...`, `‑xz`, `‑xz y=...`; and disallows: `‑z`, `‑y=one`,
+`‑y=... ‑z`.
 
 Note that, when performing a check using the parsed value of an argument and
 that argument is configured as an array (`{ array: true }`), that array will be
@@ -609,7 +609,7 @@ achieved via [`subOptionOf`][19].
 
 > [!NOTE]
 >
-> `{ P: { demandThisOption: true }}` can be read as `P`, with truth values
+> `{ P: { demandThisOption: true }}` can be read as `P`, with truth values
 > denoting existence.
 
 `demandThisOption` enables checks to ensure an argument is always given. This is
@@ -640,7 +640,7 @@ This configuration will trigger a check to ensure that `‑x` is given.
 
 > [!NOTE]
 >
-> `{ P: { demandThisOptionOr: [Q, R] }}` can be read as `P ∨ Q ∨ R`, with truth
+> `{ P: { demandThisOptionOr: [Q, R] }}` can be read as `P ∨ Q ∨ R`, with truth
 > values denoting existence.
 
 `demandThisOptionOr` enables non-optional inclusive disjunction checks per
@@ -679,7 +679,7 @@ example:
 ```
 
 This configuration allows the following arguments: `‑x`, `‑y=one`, `‑z`,
-`‑x ‑y=...`, `‑xz`, `‑y=... ‑z`, `‑xz ‑y=...`; and disallows: no arguments
+`‑x ‑y=...`, `‑xz`, `‑y=... ‑z`, `‑xz ‑y=...`; and disallows: no arguments
 (`∅`), `‑y=...`.
 
 Note that, when performing a check using the parsed value of an argument and
@@ -697,7 +697,7 @@ searched for said value. Otherwise, a strict deep equality check is performed.
 
 > [!NOTE]
 >
-> `{ P: { demandThisOptionXor: [Q, R] }}` can be read as `P ⊕ Q ⊕ R`, with truth
+> `{ P: { demandThisOptionXor: [Q, R] }}` can be read as `P ⊕ Q ⊕ R`, with truth
 > values denoting existence.
 
 `demandThisOptionXor` enables non-optional exclusive disjunction checks per
@@ -738,8 +738,8 @@ example:
 ```
 
 This configuration allows the following arguments: `‑x`, `‑y=one`, `‑z`,
-`‑x ‑y=...`, `‑y=... ‑z`; and disallows: no arguments (`∅`), `‑y=...`,
-`‑x ‑y=one`, `‑xz`, `‑y=one ‑z`, `‑xz ‑y=...`.
+`‑x ‑y=...`, `‑y=... ‑z`; and disallows: no arguments (`∅`), `‑y=...`,
+`‑x ‑y=one`, `‑xz`, `‑y=one ‑z`, `‑xz ‑y=...`.
 
 Note that, when performing a check using the parsed value of an argument and
 that argument is configured as an array (`{ array: true }`), that array will be
@@ -1027,9 +1027,7 @@ export const [builder, withHandlerExtensions] = withBuilderExtensions({
             check: function (currentZArgValue, fullArgv) {
               return (
                 currentZArgValue.length >= 2 ||
-                `"z" must be an array of two or more strings, only saw: ${
-                  currentZArgValue.length ?? 0
-                }`
+                `"z" must be an array of two or more strings, only saw: ${currentZArgValue.length ?? 0}`
               );
             }
           };
