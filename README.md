@@ -1053,71 +1053,71 @@ Now we're ready to re-implement the `init` command from `myctl` using our new
 declarative superpowers:
 
 ```javascript
-export const [builder, withHandlerExtensions] = withBuilderExtensions(function (
-  blackFlag
-) {
-  blackFlag.parserConfiguration({ 'parse-numbers': false });
+export const [builder, withHandlerExtensions] = withBuilderExtensions(
+  function (blackFlag) {
+    blackFlag.parserConfiguration({ 'parse-numbers': false });
 
-  return {
-    lang: {
-      // ▼ These two are our fallback or "baseline" configurations for --lang
-      choices: ['node', 'python'],
-      demandThisOption: true,
-      default: 'python',
+    return {
+      lang: {
+        // ▼ These two are our fallback or "baseline" configurations for --lang
+        choices: ['node', 'python'],
+        demandThisOption: true,
+        default: 'python',
 
-      subOptionOf: {
-        // ▼ Yep, --lang is also a suboption of --lang
-        lang: [
-          {
-            when: (lang) => lang === 'node',
-            // ▼ Remember: updates overwrite any old config (including baseline)
-            update: {
-              choices: ['node'],
-              demandThisOption: true
+        subOptionOf: {
+          // ▼ Yep, --lang is also a suboption of --lang
+          lang: [
+            {
+              when: (lang) => lang === 'node',
+              // ▼ Remember: updates overwrite any old config (including baseline)
+              update: {
+                choices: ['node'],
+                demandThisOption: true
+              }
+            },
+            {
+              when: (lang) => lang !== 'node',
+              update: {
+                choices: ['python'],
+                demandThisOption: true
+              }
             }
-          },
-          {
-            when: (lang) => lang !== 'node',
-            update: {
-              choices: ['python'],
-              demandThisOption: true
+          ]
+        }
+      },
+
+      // Another benefit of subOptionOf: all configuration relevant to a specific
+      // option is co-located within that option and not spread across some
+      // function or file. We don't have to go looking for the logic that's
+      // modifying --version since it's all right here in one code block.
+      version: {
+        // ▼ These two are our fallback or "baseline" configurations for --version
+        string: true,
+        default: 'latest',
+
+        subOptionOf: {
+          // ▼ --version is a suboption of --lang
+          lang: [
+            {
+              when: (lang) => lang === 'node',
+              update: {
+                choices: ['19.8', '20.9', '21.1'],
+                default: '21.1'
+              }
+            },
+            {
+              when: (lang) => lang !== 'node',
+              update: {
+                choices: ['3.10', '3.11', '3.12'],
+                default: '3.12'
+              }
             }
-          }
-        ]
+          ]
+        }
       }
-    },
-
-    // Another benefit of subOptionOf: all configuration relevant to a specific
-    // option is co-located within that option and not spread across some
-    // function or file. We don't have to go looking for the logic that's
-    // modifying --version since it's all right here in one code block.
-    version: {
-      // ▼ These two are our fallback or "baseline" configurations for --version
-      string: true,
-      default: 'latest',
-
-      subOptionOf: {
-        // ▼ --version is a suboption of --lang
-        lang: [
-          {
-            when: (lang) => lang === 'node',
-            update: {
-              choices: ['19.8', '20.9', '21.1'],
-              default: '21.1'
-            }
-          },
-          {
-            when: (lang) => lang !== 'node',
-            update: {
-              choices: ['3.10', '3.11', '3.12'],
-              default: '3.12'
-            }
-          }
-        ]
-      }
-    }
-  };
-});
+    };
+  }
+);
 ```
 
 Easy peasy!
@@ -2242,7 +2242,6 @@ key][x-repo-all-contributors-emojis]):
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
-
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 <!-- remark-ignore-end -->
 
