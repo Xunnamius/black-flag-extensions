@@ -53,8 +53,6 @@ Black Flag's declarative powers.
 
 <!-- symbiote-template-region-start 3 -->
 
-<br />
-
 ---
 
 <!-- remark-ignore-start -->
