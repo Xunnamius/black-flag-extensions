@@ -1,7 +1,7 @@
 <!-- symbiote-template-region-start 1 -->
 
 <p align="center" width="100%">
-  <img width="300" src="./logo.png">
+  <img width="300" src="https://raw.githubusercontent.com/Xunnamius/symbiote/refs/heads/main/packages/bfe/logo.png">
 </p>
 
 <p align="center" width="100%">
@@ -1049,71 +1049,71 @@ Now we're ready to re-implement the `init` command from `myctl` using our new
 declarative superpowers:
 
 ```javascript
-export const [builder, withHandlerExtensions] = withBuilderExtensions(
-  function (blackFlag) {
-    blackFlag.parserConfiguration({ 'parse-numbers': false });
+export const [builder, withHandlerExtensions] = withBuilderExtensions(function (
+  blackFlag
+) {
+  blackFlag.parserConfiguration({ 'parse-numbers': false });
 
-    return {
-      lang: {
-        // ▼ These two are our fallback or "baseline" configurations for --lang
-        choices: ['node', 'python'],
-        demandThisOption: true,
-        default: 'python',
+  return {
+    lang: {
+      // ▼ These two are our fallback or "baseline" configurations for --lang
+      choices: ['node', 'python'],
+      demandThisOption: true,
+      default: 'python',
 
-        subOptionOf: {
-          // ▼ Yep, --lang is also a suboption of --lang
-          lang: [
-            {
-              when: (lang) => lang === 'node',
-              // ▼ Remember: updates overwrite any old config (including baseline)
-              update: {
-                choices: ['node'],
-                demandThisOption: true
-              }
-            },
-            {
-              when: (lang) => lang !== 'node',
-              update: {
-                choices: ['python'],
-                demandThisOption: true
-              }
+      subOptionOf: {
+        // ▼ Yep, --lang is also a suboption of --lang
+        lang: [
+          {
+            when: (lang) => lang === 'node',
+            // ▼ Remember: updates overwrite any old config (including baseline)
+            update: {
+              choices: ['node'],
+              demandThisOption: true
             }
-          ]
-        }
-      },
-
-      // Another benefit of subOptionOf: all configuration relevant to a specific
-      // option is co-located within that option and not spread across some
-      // function or file. We don't have to go looking for the logic that's
-      // modifying --version since it's all right here in one code block.
-      version: {
-        // ▼ These two are our fallback or "baseline" configurations for --version
-        string: true,
-        default: 'latest',
-
-        subOptionOf: {
-          // ▼ --version is a suboption of --lang
-          lang: [
-            {
-              when: (lang) => lang === 'node',
-              update: {
-                choices: ['19.8', '20.9', '21.1'],
-                default: '21.1'
-              }
-            },
-            {
-              when: (lang) => lang !== 'node',
-              update: {
-                choices: ['3.10', '3.11', '3.12'],
-                default: '3.12'
-              }
+          },
+          {
+            when: (lang) => lang !== 'node',
+            update: {
+              choices: ['python'],
+              demandThisOption: true
             }
-          ]
-        }
+          }
+        ]
       }
-    };
-  }
-);
+    },
+
+    // Another benefit of subOptionOf: all configuration relevant to a specific
+    // option is co-located within that option and not spread across some
+    // function or file. We don't have to go looking for the logic that's
+    // modifying --version since it's all right here in one code block.
+    version: {
+      // ▼ These two are our fallback or "baseline" configurations for --version
+      string: true,
+      default: 'latest',
+
+      subOptionOf: {
+        // ▼ --version is a suboption of --lang
+        lang: [
+          {
+            when: (lang) => lang === 'node',
+            update: {
+              choices: ['19.8', '20.9', '21.1'],
+              default: '21.1'
+            }
+          },
+          {
+            when: (lang) => lang !== 'node',
+            update: {
+              choices: ['3.10', '3.11', '3.12'],
+              default: '3.12'
+            }
+          }
+        ]
+      }
+    }
+  };
+});
 ```
 
 Easy peasy!
@@ -2238,6 +2238,7 @@ key][x-repo-all-contributors-emojis]):
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 <!-- remark-ignore-end -->
 
@@ -2253,25 +2254,24 @@ specification. Contributions of any kind welcome!
 [x-badge-blm-image]: https://xunn.at/badge-blm 'Join the movement!'
 [x-badge-blm-link]: https://xunn.at/donate-blm
 [x-badge-codecov-image]:
-  https://img.shields.io/codecov/c/github/Xunnamius/black-flag-extensions/main?style=flat-square&token=HWRIOBAAPW&flag=package.main_root
+  https://img.shields.io/codecov/c/github/Xunnamius/symbiote/main?style=flat-square&token=HWRIOBAAPW&flag=package.main_root
   'Is this package well-tested?'
-[x-badge-codecov-link]: https://codecov.io/gh/Xunnamius/black-flag-extensions
+[x-badge-codecov-link]: https://codecov.io/gh/Xunnamius/symbiote
 [x-badge-downloads-image]:
   https://img.shields.io/npm/dm/@black-flag/extensions?style=flat-square
   'Number of times this package has been downloaded per month'
 [x-badge-lastcommit-image]:
-  https://img.shields.io/github/last-commit/xunnamius/black-flag-extensions?style=flat-square
+  https://img.shields.io/github/last-commit/Xunnamius/symbiote?style=flat-square
   'Latest commit timestamp'
 [x-badge-license-image]:
   https://img.shields.io/npm/l/@black-flag/extensions?style=flat-square
   "This package's source license"
-[x-badge-license-link]:
-  https://github.com/Xunnamius/black-flag-extensions/blob/main/LICENSE
+[x-badge-license-link]: https://github.com/Xunnamius/symbiote/blob/main/LICENSE
 [x-badge-npm-image]:
   https://xunn.at/npm-pkg-version/@black-flag/extensions
   'Install this package using npm or yarn!'
 [x-badge-npm-link]: https://npmtrends.com/@black-flag/extensions
-[x-badge-repo-link]: https://github.com/xunnamius/black-flag-extensions
+[x-badge-repo-link]: https://github.com/Xunnamius/symbiote
 [x-badge-semanticrelease-image]:
   https://xunn.at/badge-semantic-release
   'This repo practices continuous integration and deployment!'
@@ -2294,16 +2294,14 @@ specification. Contributions of any kind welcome!
 [x-pkg-tree-shaking]: https://webpack.js.org/guides/tree-shaking
 [x-pkg-type]:
   https://github.com/nodejs/node/blob/8d8e06a345043bec787e904edc9a2f5c5e9c275f/doc/api/packages.md#type
-[x-repo-all-contributors]: https://github.com/all-contributors/all-contributors
-[x-repo-all-contributors-emojis]: https://allcontributors.org/docs/en/emoji-key
 [x-repo-choose-new-issue]:
-  https://github.com/xunnamius/black-flag-extensions/issues/new/choose
+  https://github.com/Xunnamius/symbiote/issues/new/choose
 [x-repo-contributing]: /CONTRIBUTING.md
 [x-repo-contributors]: /README.md#contributors
 [x-repo-docs]: docs
 [x-repo-license]: ./LICENSE
 [x-repo-package-json]: package.json
-[x-repo-pr-compare]: https://github.com/xunnamius/black-flag-extensions/compare
+[x-repo-pr-compare]: https://github.com/Xunnamius/symbiote/compare
 [x-repo-sponsor]: https://github.com/sponsors/Xunnamius
 [x-repo-support]: /.github/SUPPORT.md
 [1]: https://github.com/yargs/yargs/issues
