@@ -1,7 +1,7 @@
 <!-- symbiote-template-region-start 1 -->
 
 <p align="center" width="100%">
-  <img width="300" src="https://raw.githubusercontent.com/Xunnamius/symbiote/refs/heads/main/packages/bfe/logo.png">
+  <img width="300" src="https://raw.githubusercontent.com/Xunnamius/black-flag-extensions/refs/heads/main/logo.png">
 </p>
 
 <p align="center" width="100%">
@@ -21,7 +21,7 @@ A collection of set-theoretic declarative-first APIs for yargs and <a href="http
 [![Uses Semantic Release!][x-badge-semanticrelease-image]][x-badge-semanticrelease-link]
 
 [![NPM version][x-badge-npm-image]][x-badge-npm-link]
-[![Monthly Downloads][x-badge-downloads-image]][x-badge-npm-link]
+[![Monthly Downloads][x-badge-downloads-image]][x-badge-downloads-link]
 
 </div>
 
@@ -1049,71 +1049,71 @@ Now we're ready to re-implement the `init` command from `myctl` using our new
 declarative superpowers:
 
 ```javascript
-export const [builder, withHandlerExtensions] = withBuilderExtensions(function (
-  blackFlag
-) {
-  blackFlag.parserConfiguration({ 'parse-numbers': false });
+export const [builder, withHandlerExtensions] = withBuilderExtensions(
+  function (blackFlag) {
+    blackFlag.parserConfiguration({ 'parse-numbers': false });
 
-  return {
-    lang: {
-      // ▼ These two are our fallback or "baseline" configurations for --lang
-      choices: ['node', 'python'],
-      demandThisOption: true,
-      default: 'python',
+    return {
+      lang: {
+        // ▼ These two are our fallback or "baseline" configurations for --lang
+        choices: ['node', 'python'],
+        demandThisOption: true,
+        default: 'python',
 
-      subOptionOf: {
-        // ▼ Yep, --lang is also a suboption of --lang
-        lang: [
-          {
-            when: (lang) => lang === 'node',
-            // ▼ Remember: updates overwrite any old config (including baseline)
-            update: {
-              choices: ['node'],
-              demandThisOption: true
+        subOptionOf: {
+          // ▼ Yep, --lang is also a suboption of --lang
+          lang: [
+            {
+              when: (lang) => lang === 'node',
+              // ▼ Remember: updates overwrite any old config (including baseline)
+              update: {
+                choices: ['node'],
+                demandThisOption: true
+              }
+            },
+            {
+              when: (lang) => lang !== 'node',
+              update: {
+                choices: ['python'],
+                demandThisOption: true
+              }
             }
-          },
-          {
-            when: (lang) => lang !== 'node',
-            update: {
-              choices: ['python'],
-              demandThisOption: true
+          ]
+        }
+      },
+
+      // Another benefit of subOptionOf: all configuration relevant to a specific
+      // option is co-located within that option and not spread across some
+      // function or file. We don't have to go looking for the logic that's
+      // modifying --version since it's all right here in one code block.
+      version: {
+        // ▼ These two are our fallback or "baseline" configurations for --version
+        string: true,
+        default: 'latest',
+
+        subOptionOf: {
+          // ▼ --version is a suboption of --lang
+          lang: [
+            {
+              when: (lang) => lang === 'node',
+              update: {
+                choices: ['19.8', '20.9', '21.1'],
+                default: '21.1'
+              }
+            },
+            {
+              when: (lang) => lang !== 'node',
+              update: {
+                choices: ['3.10', '3.11', '3.12'],
+                default: '3.12'
+              }
             }
-          }
-        ]
+          ]
+        }
       }
-    },
-
-    // Another benefit of subOptionOf: all configuration relevant to a specific
-    // option is co-located within that option and not spread across some
-    // function or file. We don't have to go looking for the logic that's
-    // modifying --version since it's all right here in one code block.
-    version: {
-      // ▼ These two are our fallback or "baseline" configurations for --version
-      string: true,
-      default: 'latest',
-
-      subOptionOf: {
-        // ▼ --version is a suboption of --lang
-        lang: [
-          {
-            when: (lang) => lang === 'node',
-            update: {
-              choices: ['19.8', '20.9', '21.1'],
-              default: '21.1'
-            }
-          },
-          {
-            when: (lang) => lang !== 'node',
-            update: {
-              choices: ['3.10', '3.11', '3.12'],
-              default: '3.12'
-            }
-          }
-        ]
-      }
-    }
-  };
-});
+    };
+  }
+);
 ```
 
 Easy peasy!
@@ -2141,6 +2141,7 @@ TypeScript users, this package supports both `"Node10"` and `"Node16"` module
 resolution strategies.
 
 <!-- symbiote-template-region-end -->
+<!-- TODO: additional package details here -->
 <!-- symbiote-template-region-start 7 -->
 
 <details><summary>Expand details</summary>
@@ -2174,6 +2175,7 @@ also that [`package.json`][x-repo-package-json] may include the
 optimal [tree shaking][x-pkg-tree-shaking] where appropriate.
 
 <!-- symbiote-template-region-end -->
+<!-- TODO: additional package details here -->
 <!-- symbiote-template-region-start 8 -->
 
 </details>
@@ -2184,6 +2186,7 @@ optimal [tree shaking][x-pkg-tree-shaking] where appropriate.
 
 See [LICENSE][x-repo-license].
 
+<!-- TODO: additional license information and/or sections here -->
 <!-- symbiote-template-region-start 9 -->
 
 ## Contributing and Support
@@ -2197,6 +2200,7 @@ See [CONTRIBUTING.md][x-repo-contributing] and [SUPPORT.md][x-repo-support] for
 more information.
 
 <!-- symbiote-template-region-end -->
+<!-- TODO: additional contribution/support sections here -->
 <!-- symbiote-template-region-start 10 -->
 
 ### Contributors
@@ -2238,14 +2242,12 @@ key][x-repo-all-contributors-emojis]):
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
-
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 <!-- remark-ignore-end -->
 
 This project follows the [all-contributors][x-repo-all-contributors]
 specification. Contributions of any kind welcome!
 
-<!-- remark-ignore-start -->
 <!-- symbiote-template-region-end -->
 <!-- symbiote-template-region-start workspace-package-only -->
 <!-- (section elided by symbiote) -->
@@ -2254,24 +2256,26 @@ specification. Contributions of any kind welcome!
 [x-badge-blm-image]: https://xunn.at/badge-blm 'Join the movement!'
 [x-badge-blm-link]: https://xunn.at/donate-blm
 [x-badge-codecov-image]:
-  https://img.shields.io/codecov/c/github/Xunnamius/symbiote/main?style=flat-square&token=HWRIOBAAPW&flag=package.main_root
+  https://img.shields.io/codecov/c/github/Xunnamius/black-flag-extensions/main?style=flat-square&token=HWRIOBAAPW&flag=package.main_root
   'Is this package well-tested?'
-[x-badge-codecov-link]: https://codecov.io/gh/Xunnamius/symbiote
+[x-badge-codecov-link]: https://codecov.io/gh/Xunnamius/black-flag-extensions
 [x-badge-downloads-image]:
   https://img.shields.io/npm/dm/@black-flag/extensions?style=flat-square
   'Number of times this package has been downloaded per month'
+[x-badge-downloads-link]: https://npmtrends.com/@black-flag/extensions
 [x-badge-lastcommit-image]:
-  https://img.shields.io/github/last-commit/Xunnamius/symbiote?style=flat-square
+  https://img.shields.io/github/last-commit/Xunnamius/black-flag-extensions?style=flat-square
   'Latest commit timestamp'
 [x-badge-license-image]:
   https://img.shields.io/npm/l/@black-flag/extensions?style=flat-square
   "This package's source license"
-[x-badge-license-link]: https://github.com/Xunnamius/symbiote/blob/main/LICENSE
+[x-badge-license-link]:
+  https://github.com/Xunnamius/black-flag-extensions/blob/main/LICENSE
 [x-badge-npm-image]:
   https://xunn.at/npm-pkg-version/@black-flag/extensions
   'Install this package using npm or yarn!'
-[x-badge-npm-link]: https://npmtrends.com/@black-flag/extensions
-[x-badge-repo-link]: https://github.com/Xunnamius/symbiote
+[x-badge-npm-link]: https://npm.im/@black-flag/extensions
+[x-badge-repo-link]: https://github.com/Xunnamius/black-flag-extensions
 [x-badge-semanticrelease-image]:
   https://xunn.at/badge-semantic-release
   'This repo practices continuous integration and deployment!'
@@ -2281,8 +2285,6 @@ specification. Contributions of any kind welcome!
   https://dev.to/jakobjingleheimer/configuring-commonjs-es-modules-for-nodejs-12ed#publish-only-a-cjs-distribution-with-property-exports
 [x-pkg-dual-package-hazard]:
   https://nodejs.org/api/packages.html#dual-package-hazard
-[x-pkg-esm-wine]:
-  https://dev.to/jakobjingleheimer/configuring-commonjs-es-modules-for-nodejs-12ed#esm-source-and-distribution
 [x-pkg-exports-conditions]:
   https://webpack.js.org/guides/package-exports#reference-syntax
 [x-pkg-exports-module-key]:
@@ -2294,14 +2296,15 @@ specification. Contributions of any kind welcome!
 [x-pkg-tree-shaking]: https://webpack.js.org/guides/tree-shaking
 [x-pkg-type]:
   https://github.com/nodejs/node/blob/8d8e06a345043bec787e904edc9a2f5c5e9c275f/doc/api/packages.md#type
+[x-repo-all-contributors]: https://github.com/all-contributors/all-contributors
+[x-repo-all-contributors-emojis]: https://allcontributors.org/docs/en/emoji-key
 [x-repo-choose-new-issue]:
-  https://github.com/Xunnamius/symbiote/issues/new/choose
+  https://github.com/Xunnamius/black-flag-extensions/issues/new/choose
 [x-repo-contributing]: /CONTRIBUTING.md
-[x-repo-contributors]: /README.md#contributors
 [x-repo-docs]: docs
 [x-repo-license]: ./LICENSE
 [x-repo-package-json]: package.json
-[x-repo-pr-compare]: https://github.com/Xunnamius/symbiote/compare
+[x-repo-pr-compare]: https://github.com/Xunnamius/black-flag-extensions/compare
 [x-repo-sponsor]: https://github.com/sponsors/Xunnamius
 [x-repo-support]: /.github/SUPPORT.md
 [1]: https://github.com/yargs/yargs/issues
