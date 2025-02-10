@@ -83,7 +83,7 @@
   },
   "devDependencies": {
     "@-xun/run": "^0.0.1",
-    "@-xun/symbiote": "^2.20.0",
+    "@-xun/symbiote": "^2.23.6",
     "@types/glob": "^8.1.0",
     "@types/lodash.mergewith": "^4.6.9",
     "@types/semver": "^7.5.8",
