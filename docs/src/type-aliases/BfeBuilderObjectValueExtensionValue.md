@@ -8,7 +8,7 @@
 
 > **BfeBuilderObjectValueExtensionValue**: `string` \| [`BfeBuilderObjectValueExtensionObject`](BfeBuilderObjectValueExtensionObject.md) \| (`string` \| [`BfeBuilderObjectValueExtensionObject`](BfeBuilderObjectValueExtensionObject.md))[]
 
-Defined in: [src/index.ts:449](https://github.com/Xunnamius/black-flag-extensions/blob/f26d26e5a4eef6b4a0f448bac9017f85ea6d5319/src/index.ts#L449)
+Defined in: [src/index.ts:451](https://github.com/Xunnamius/black-flag-extensions/blob/a33a5cac259d02354ae51b73a38791b29225ca19/src/index.ts#L451)
 
 The string/object/array type of a [BfeBuilderObjectValueExtensions](BfeBuilderObjectValueExtensions.md).
 

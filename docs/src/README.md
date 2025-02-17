@@ -34,3 +34,9 @@
 - [getInvocableExtendedHandler](functions/getInvocableExtendedHandler.md)
 - [withBuilderExtensions](functions/withBuilderExtensions.md)
 - [withUsageExtensions](functions/withUsageExtensions.md)
+
+## References
+
+### BfeErrorMessage
+
+Renames and re-exports [ErrorMessage](error/variables/ErrorMessage.md)

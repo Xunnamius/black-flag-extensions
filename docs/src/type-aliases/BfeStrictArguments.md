@@ -8,7 +8,7 @@
 
 > **BfeStrictArguments**\<`CustomCliArguments`, `CustomExecutionContext`\>: `OmitIndexSignature`\<`Arguments`\<`CustomCliArguments`, `CustomExecutionContext`\>\> & `FrameworkArguments`\<`CustomExecutionContext`\> & `object`
 
-Defined in: [src/index.ts:594](https://github.com/Xunnamius/black-flag-extensions/blob/f26d26e5a4eef6b4a0f448bac9017f85ea6d5319/src/index.ts#L594)
+Defined in: [src/index.ts:596](https://github.com/Xunnamius/black-flag-extensions/blob/a33a5cac259d02354ae51b73a38791b29225ca19/src/index.ts#L596)
 
 A stricter version of Arguments that explicitly omits the fallback
 indexer for unrecognized arguments. Even though it is the runtime equivalent

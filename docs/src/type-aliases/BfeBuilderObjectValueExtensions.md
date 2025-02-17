@@ -8,7 +8,7 @@
 
 > **BfeBuilderObjectValueExtensions**\<`CustomCliArguments`, `CustomExecutionContext`\>: `object`
 
-Defined in: [src/index.ts:224](https://github.com/Xunnamius/black-flag-extensions/blob/f26d26e5a4eef6b4a0f448bac9017f85ea6d5319/src/index.ts#L224)
+Defined in: [src/index.ts:226](https://github.com/Xunnamius/black-flag-extensions/blob/a33a5cac259d02354ae51b73a38791b29225ca19/src/index.ts#L226)
 
 An object containing only those properties recognized by
 BFE.

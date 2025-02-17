@@ -8,7 +8,7 @@
 
 > **WithBuilderExtensionsReturnType**\<`CustomCliArguments`, `CustomExecutionContext`\>: \[[`BfeBuilderFunction`](BfeBuilderFunction.md)\<`CustomCliArguments`, `CustomExecutionContext`\>, [`WithHandlerExtensions`](WithHandlerExtensions.md)\<`CustomCliArguments`, `CustomExecutionContext`\>\]
 
-Defined in: [src/index.ts:668](https://github.com/Xunnamius/black-flag-extensions/blob/f26d26e5a4eef6b4a0f448bac9017f85ea6d5319/src/index.ts#L668)
+Defined in: [src/index.ts:670](https://github.com/Xunnamius/black-flag-extensions/blob/a33a5cac259d02354ae51b73a38791b29225ca19/src/index.ts#L670)
 
 The array of extended exports and high-order functions returned by
 [withBuilderExtensions](../functions/withBuilderExtensions.md).
