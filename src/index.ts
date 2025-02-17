@@ -152,7 +152,7 @@ type FlattenedExtensionValue = Record<
   BfeBuilderObjectValueExtensionObject[string] | typeof $exists
 > & { [$genesis]?: string };
 
-export { ErrorMessage as BfeErrorMessage };
+export { $artificiallyInvoked, ErrorMessage as BfeErrorMessage };
 
 /**
  * The function type of the `builder` export accepted by Black Flag.
