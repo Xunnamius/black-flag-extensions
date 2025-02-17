@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // * These tests ensure the exported interface under test functions as expected.
 
 import { setTimeout as delay } from 'node:timers/promises';
@@ -4891,13 +4894,13 @@ describe('::withBuilderExtensions', () => {
       Error
     >;
 
-    expect(secondPassResult?.a.coerce?.('a')).toBe('a');
-    expect(secondPassResult?.b.coerce?.('b')).toStrictEqual(['b']);
-    expect(secondPassResult?.c.coerce?.('c')).toStrictEqual(['c']);
+    expect(secondPassResult?.a?.coerce?.('a')).toBe('a');
+    expect(secondPassResult?.b?.coerce?.('b')).toStrictEqual(['b']);
+    expect(secondPassResult?.c?.coerce?.('c')).toStrictEqual(['c']);
 
-    expect(secondPassResult?.a.coerce?.(['a'])).toStrictEqual(['a']);
-    expect(secondPassResult?.b.coerce?.(['b'])).toStrictEqual(['b']);
-    expect(secondPassResult?.c.coerce?.(['c'])).toStrictEqual(['c']);
+    expect(secondPassResult?.a?.coerce?.(['a'])).toStrictEqual(['a']);
+    expect(secondPassResult?.b?.coerce?.(['b'])).toStrictEqual(['b']);
+    expect(secondPassResult?.c?.coerce?.(['c'])).toStrictEqual(['c']);
   });
 
   it('throws a framework error when providing an explicitly undefined default', async () => {

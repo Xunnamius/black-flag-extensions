@@ -514,9 +514,14 @@ _Is building and patching:_
 
 _Is building and not patching:_
 
+<!-- TODO: remove these "disable" toggles after fixing list-item-style bug -->
+<!-- lint disable list-item-style -->
+
 - `build-tool ‑patch=false`
 - `build-tool ‑no‑patch`
 - _`build-tool ‑no‑patch ‑no‑only‑patch`_ (this is the interesting one)
+
+<!-- lint enable list-item-style -->
 
 _Is patching and not building:_
 
@@ -2310,7 +2315,7 @@ specification. Contributions of any kind welcome!
 [1]: https://github.com/yargs/yargs/issues
 [2]: #black-flag-versus-black-flag-extensions
 [3]: #differences-between-black-flag-extensions-and-yargs
-[4]: ./docs/functions/withBuilderExtensions.md
+[4]: ./docs/src/functions/withBuilderExtensions.md
 [5]:
   https://github.com/Xunnamius/black-flag/blob/main/docs/index/type-aliases/Configuration.md#builder
 [6]:
@@ -2347,7 +2352,7 @@ specification. Contributions of any kind welcome!
 [31]: #strange-and-impossible-configurations
 [32]: https://yargs.js.org/docs#api-reference-groupkeys-groupname
 [33]: https://github.com/Xunnamius/xunnctl?tab=readme-ov-file#xunnctl
-[34]: ./docs/functions/withUsageExtensions.md
+[34]: ./docs/src/functions/withUsageExtensions.md
 [35]: https://github.com/Xunnamius/symbiote/blob/main/src/commands/deploy.ts
 [36]: https://yargs.js.org/docs#api-reference
 [37]:
@@ -2365,7 +2370,7 @@ specification. Contributions of any kind welcome!
 [47]: https://github.com/yargs/yargs/issues/1680
 [48]: https://github.com/yargs/yargs/issues/1599
 [49]: https://github.com/yargs/yargs/issues/1611
-[50]: ./docs/functions/getInvocableExtendedHandler.md
+[50]: ./docs/src/functions/getInvocableExtendedHandler.md
 [51]: https://github.com/yargs/yargs-parser?tab=readme-ov-file#configuration
 [52]: #vacuousimplications
 [53]: https://en.wikipedia.org/wiki/Vacuous_truth
