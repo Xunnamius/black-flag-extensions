@@ -8,7 +8,7 @@
 
 > **WithBuilderExtensionsConfig**\<`CustomCliArguments`\>: `object`
 
-Defined in: [src/index.ts:685](https://github.com/Xunnamius/black-flag-extensions/blob/a33a5cac259d02354ae51b73a38791b29225ca19/src/index.ts#L685)
+Defined in: [src/index.ts:685](https://github.com/Xunnamius/black-flag-extensions/blob/58ca41292dc469d27da4ef365acd1d10c30aedca/src/index.ts#L685)
 
 A configuration object that further configures the behavior of
 [withBuilderExtensions](../functions/withBuilderExtensions.md).

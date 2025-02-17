@@ -37,6 +37,12 @@
 
 ## References
 
+### $artificiallyInvoked
+
+Re-exports [$artificiallyInvoked](symbols/variables/$artificiallyInvoked.md)
+
+***
+
 ### BfeErrorMessage
 
 Renames and re-exports [ErrorMessage](error/variables/ErrorMessage.md)

@@ -8,7 +8,7 @@
 
 > **WithHandlerExtensions**\<`CustomCliArguments`, `CustomExecutionContext`\>: (`customHandler`?) => `Configuration`\<`CustomCliArguments`, `CustomExecutionContext`\>\[`"handler"`\]
 
-Defined in: [src/index.ts:657](https://github.com/Xunnamius/black-flag-extensions/blob/a33a5cac259d02354ae51b73a38791b29225ca19/src/index.ts#L657)
+Defined in: [src/index.ts:657](https://github.com/Xunnamius/black-flag-extensions/blob/58ca41292dc469d27da4ef365acd1d10c30aedca/src/index.ts#L657)
 
 This function implements several additional optionals-related units of
 functionality. The return value of this function is meant to take the place

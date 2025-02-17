@@ -8,7 +8,7 @@
 
 > `const` **$canonical**: *typeof* [`$canonical`]($canonical.md)
 
-Defined in: [src/symbols.ts:22](https://github.com/Xunnamius/black-flag-extensions/blob/a33a5cac259d02354ae51b73a38791b29225ca19/src/symbols.ts#L22)
+Defined in: [src/symbols.ts:22](https://github.com/Xunnamius/black-flag-extensions/blob/58ca41292dc469d27da4ef365acd1d10c30aedca/src/symbols.ts#L22)
 
 Represents the canonical form of an implication (i.e. excluding expansions,
 aliases, etc).

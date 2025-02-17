@@ -8,7 +8,7 @@
 
 > **withUsageExtensions**(`altDescription`, `__namedParameters`): `string`
 
-Defined in: [src/index.ts:1309](https://github.com/Xunnamius/black-flag-extensions/blob/a33a5cac259d02354ae51b73a38791b29225ca19/src/index.ts#L1309)
+Defined in: [src/index.ts:1309](https://github.com/Xunnamius/black-flag-extensions/blob/58ca41292dc469d27da4ef365acd1d10c30aedca/src/index.ts#L1309)
 
 Generate command usage text consistently yet flexibly.
 
