@@ -84,7 +84,7 @@
     "type-fest": "^4.35.0"
   },
   "devDependencies": {
-    "@-xun/symbiote": "^2.25.1",
+    "@-xun/symbiote": "^3.0.0",
     "@types/lodash.camelcase": "^4.3.9",
     "@types/lodash.clone": "^4.5.9",
     "@types/lodash.clonedeepwith": "^4.5.9",
